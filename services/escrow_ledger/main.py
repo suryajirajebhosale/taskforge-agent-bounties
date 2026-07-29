@@ -17,6 +17,11 @@ app = FastAPI(
 )
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "escrow_ledger"}
+
+
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
