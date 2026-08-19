@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --background: #05060a;
+  --foreground: #e8ebf5;
+  --panel: #0b0d16;
+  --panel-border: #ffffff14;
+  --teal: #2dd4bf;
+  --cyan: #22d3ee;
+  --violet: #8b5cf6;
+  --magenta: #ec4899;
+  --muted: #8b93ac;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-panel: var(--panel);
+  --color-panel-border: var(--panel-border);
+  --color-teal: var(--teal);
+  --color-cyan: var(--cyan);
+  --color-violet: var(--violet);
+  --color-magenta: var(--magenta);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--violet);
+  color: white;
+}
+
+/* ---- reusable gradient text/utilities ---- */
+
+@utility text-gradient {
+  background: linear-gradient(90deg, var(--teal), var(--cyan) 40%, var(--violet) 75%, var(--magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-gradient-brand {
+  background: linear-gradient(135deg, var(--teal), var(--violet) 60%, var(--magenta));
+}
+
+@utility border-glow {
+  box-shadow: 0 0 0 1px var(--panel-border), 0 20px 60px -20px #7c3aed40;
+}
+
+/* ---- dashed tick divider, matching the reference's section-label rule ---- */
+
+@utility tick-divider {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--panel-border) 0,
+    var(--panel-border) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+  background-size: 10px 1px;
+  background-repeat: repeat-x;
+  background-position: left center;
+}
+
+/* ---- 3D cube ---- */
+
+@utility perspective-1000 {
+  perspective: 1200px;
+}
+
+@utility preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
+@keyframes spin3d {
+  from {
+    transform: rotateX(-20deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(-20deg) rotateY(360deg);
+  }
+}
+
+@utility animate-spin3d {
+  animation: spin3d 16s linear infinite;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@utility animate-float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@utility animate-pulse-glow {
+  animation: pulse-glow 3.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-spin3d,
+  .animate-float,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
+}
