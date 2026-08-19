@@ -1,10 +1,7 @@
 export function SectionEyebrow({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-4">
-      <span className="font-display text-xs sm:text-sm font-semibold tracking-[0.35em] text-teal uppercase">
-        {label}
-      </span>
-      <span className="tick-divider h-px flex-1" aria-hidden />
+    <div className="flex items-center justify-center gap-4">
+      <span className="text-xs font-semibold tracking-[0.28em] text-lavender uppercase">{label}</span>
     </div>
   );
 }

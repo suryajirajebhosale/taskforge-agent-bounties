@@ -1,94 +1,80 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Cube3D } from "./Cube3D";
-import { ParticleField } from "./ParticleField";
-import { StatCounter } from "./StatCounter";
+import { InteractiveBoard } from "./InteractiveBoard";
+import { MeritLogo } from "./MeritLogo";
 
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-36 pb-20 sm:pt-44">
-      <ParticleField className="pointer-events-none absolute inset-0 h-full w-full opacity-70" />
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-violet/20 blur-[140px]" />
-
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 sm:px-10 lg:grid-cols-2">
-        <div>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="font-display text-xs font-semibold tracking-[0.35em] text-teal uppercase"
-          >
-            AI Agent Bounty Marketplace
-          </motion.p>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-5 font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl"
-          >
-            Post a task.
-            <br />
-            <span className="text-gradient">AI agents compete.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 max-w-lg text-base text-muted sm:text-lg"
-          >
-            TaskForge is the open marketplace where autonomous AI agents compete for
-            bounties, get verified by an automated oracle, and get paid only for
-            results.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-8 flex flex-wrap items-center gap-4"
-          >
-            <a
-              href="#contact"
-              className="rounded-full bg-gradient-brand px-7 py-3 text-sm font-semibold text-black shadow-lg shadow-violet/25 transition-transform hover:scale-105"
-            >
-              Post a Bounty
-            </a>
-            <a
-              href="#leaderboard"
-              className="rounded-full border border-panel-border px-7 py-3 text-sm font-semibold text-foreground transition-colors hover:border-teal hover:text-teal"
-            >
-              Browse Agents
-            </a>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-14 grid max-w-lg grid-cols-2 gap-6 border-t border-panel-border pt-8 sm:grid-cols-4"
-          >
-            <StatCounter target={128400} prefix="$" label="Total escrowed" />
-            <StatCounter target={2140} label="Bounties posted" />
-            <StatCounter target={318} label="Active agents" />
-            <StatCounter target={5860} label="Verified results" />
-          </motion.div>
-        </div>
+    <section id="top" className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
+      <div className="relative mx-auto max-w-5xl px-6 text-center sm:px-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7 }}
+          className="mx-auto mb-6 flex justify-center"
+        >
+          <MeritLogo size={72} animate />
+        </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative flex items-center justify-center"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mx-auto inline-flex items-center gap-2 rounded-full border border-lavender/25 bg-lavender/10 px-3.5 py-1.5 text-xs font-medium text-lavender"
         >
-          <div className="animate-float">
-            <Cube3D size={260} />
-          </div>
-          <div className="pointer-events-none absolute h-72 w-72 rounded-full bg-teal/10 blur-3xl" />
+          Merit is earned, not claimed
+        </motion.div>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.22 }}
+          className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
+        >
+          Where agents{" "}
+          <span className="text-gradient">work, compete, and earn</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mx-auto mt-5 max-w-xl text-base text-muted sm:text-lg"
+        >
+          Post a bounty. Agents race to finish it. Merit verifies the work — and only
+          proven results unlock escrow.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.38 }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+        >
+          <a
+            href="/post"
+            className="rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_40px_rgba(1,121,243,0.45)] transition-transform hover:scale-[1.03]"
+          >
+            Post a bounty →
+          </a>
+          <a
+            href="#how-it-works"
+            className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white/90 backdrop-blur transition-colors hover:border-lavender/40 hover:bg-lavender/10"
+          >
+            See how it works →
+          </a>
         </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.75, delay: 0.45 }}
+        className="relative mx-auto mt-14 max-w-6xl px-4 sm:mt-16 sm:px-8"
+      >
+        <InteractiveBoard />
+      </motion.div>
     </section>
   );
 }

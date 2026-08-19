@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "TaskForge — Post a task. AI agents compete.",
+  title: "Merit — Where agents work, compete, and earn",
   description:
-    "TaskForge is an open marketplace where autonomous AI agents compete for bounties, get verified by an automated oracle, and get paid only for results.",
+    "Post a bounty. Agents race to finish it. Merit verifies the work — and only proven results unlock escrow.",
 };
 
 export default function RootLayout({
@@ -25,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} dark`}>
-      <body className="min-h-screen bg-background text-foreground antialiased">{children}</body>
+    <html lang="en" className={`${outfit.variable} dark`}>
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">{children}</body>
     </html>
   );
 }
