@@ -3,370 +3,151 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-type ColumnId = "open" | "competing" | "verified";
+type ColumnId = "catalog" | "running" | "paid";
 
-type BountyCard = {
+type JobCard = {
   id: string;
   title: string;
-  tag: string;
-  reward: string;
-  agents: { name: string; color: string }[];
+  agent: string;
+  color: string;
+  price: string;
   column: ColumnId;
   eta: string;
-  escrow: string;
-  /** Only this card is auto-advanced in live demo mode */
+  status: string;
   demo?: boolean;
 };
 
-const AGENT_COLORS = ["#0179F3", "#3DA5FF", "#5EEAD4", "#818CF8", "#38BDF8", "#67E8F9"];
-
-const A = {
-  Ledger: { name: "Ledger", color: AGENT_COLORS[0] },
-  Atlas: { name: "Atlas", color: AGENT_COLORS[1] },
-  Scouter: { name: "Scouter", color: AGENT_COLORS[2] },
-  Navigator: { name: "Navigator", color: AGENT_COLORS[3] },
-  Cloud: { name: "Cloud", color: AGENT_COLORS[4] },
-  LightX: { name: "LightX", color: AGENT_COLORS[5] },
-  Index: { name: "Index", color: AGENT_COLORS[0] },
-  Shaw: { name: "Shaw", color: AGENT_COLORS[2] },
+const C = {
+  Ledger: "#0179F3",
+  Scouter: "#5EEAD4",
+  Atlas: "#3DA5FF",
 };
 
-const INITIAL: BountyCard[] = [
-  // Open — keep this column full; only the demo card auto-moves
+const INITIAL: JobCard[] = [
   {
     id: "demo",
-    title: "Find 100 ecommerce brands",
-    tag: "Lead gen",
-    reward: "$48",
-    agents: [A.Ledger, A.Scouter],
-    column: "open",
-    eta: "12h left",
-    escrow: "Held",
+    title: "Enrich 80 ecommerce domains",
+    agent: "Ledger",
+    color: C.Ledger,
+    price: "960 credits",
+    column: "catalog",
+    eta: "Ready to run",
+    status: "Certified",
     demo: true,
   },
   {
     id: "2",
-    title: "Competitor pricing brief",
-    tag: "Research",
-    reward: "$32",
-    agents: [A.Atlas],
-    column: "open",
-    eta: "2d left",
-    escrow: "Held",
+    title: "Founder emails · 40 rows",
+    agent: "Scouter",
+    color: C.Scouter,
+    price: "720 credits",
+    column: "catalog",
+    eta: "Pick agent",
+    status: "Certified",
   },
   {
     id: "3",
-    title: "Series A investor shortlist",
-    tag: "Lead gen",
-    reward: "$90",
-    agents: [A.Ledger, A.Index],
-    column: "open",
-    eta: "18h left",
-    escrow: "Held",
+    title: "Sandbox enrich · 15 rows",
+    agent: "Atlas",
+    color: C.Atlas,
+    price: "120 credits",
+    column: "catalog",
+    eta: "Capped run",
+    status: "Sandbox",
   },
   {
     id: "4",
-    title: "Landing page copy rewrite",
-    tag: "Content",
-    reward: "$40",
-    agents: [A.LightX],
-    column: "open",
-    eta: "3d left",
-    escrow: "Held",
+    title: "ICP filter · $1M–$25M",
+    agent: "Scouter",
+    color: C.Scouter,
+    price: "Hire · month 2",
+    column: "running",
+    eta: "Grading",
+    status: "Hired",
   },
   {
     id: "5",
-    title: "Shopify store audit checklist",
-    tag: "Research",
-    reward: "$36",
-    agents: [A.Scouter, A.Atlas],
-    column: "open",
-    eta: "9h left",
-    escrow: "Held",
+    title: "VP Sales list · 200 rows",
+    agent: "Ledger",
+    color: C.Ledger,
+    price: "2,400 credits",
+    column: "running",
+    eta: "Oracle",
+    status: "Running",
   },
   {
     id: "6",
-    title: "Cold email sequences ×5",
-    tag: "Sales",
-    reward: "$65",
-    agents: [A.Shaw, A.Ledger],
-    column: "open",
-    eta: "1d left",
-    escrow: "Held",
+    title: "Domain enrich · 60 rows",
+    agent: "Ledger",
+    color: C.Ledger,
+    price: "Paid $7.20",
+    column: "paid",
+    eta: "Pass",
+    status: "Released",
   },
-  {
-    id: "19",
-    title: "Fintech compliance FAQ pack",
-    tag: "Content",
-    reward: "$52",
-    agents: [A.LightX, A.Index],
-    column: "open",
-    eta: "20h left",
-    escrow: "Held",
-  },
-  {
-    id: "20",
-    title: "Agency client lead scrape",
-    tag: "Lead gen",
-    reward: "$58",
-    agents: [A.Ledger, A.Shaw],
-    column: "open",
-    eta: "14h left",
-    escrow: "Held",
-  },
-  {
-    id: "21",
-    title: "Competitor feature matrix",
-    tag: "Research",
-    reward: "$44",
-    agents: [A.Atlas, A.Scouter],
-    column: "open",
-    eta: "2d left",
-    escrow: "Held",
-  },
-  {
-    id: "22",
-    title: "Onboarding email drip ×7",
-    tag: "Sales",
-    reward: "$38",
-    agents: [A.Shaw],
-    column: "open",
-    eta: "16h left",
-    escrow: "Held",
-  },
-  {
-    id: "23",
-    title: "Open-source license audit",
-    tag: "Build",
-    reward: "$85",
-    agents: [A.Navigator, A.Cloud],
-    column: "open",
-    eta: "4d left",
-    escrow: "Held",
-  },
-  {
-    id: "24",
-    title: "Design system token inventory",
-    tag: "Build",
-    reward: "$72",
-    agents: [A.Cloud],
-    column: "open",
-    eta: "2d left",
-    escrow: "Held",
-  },
-  // Competing
   {
     id: "7",
-    title: "Chrome extension scaffold",
-    tag: "Build",
-    reward: "$120",
-    agents: [A.Navigator, A.Cloud, A.Atlas],
-    column: "competing",
-    eta: "3 racing",
-    escrow: "Locked",
-  },
-  {
-    id: "8",
-    title: "Recruiting outreach pack",
-    tag: "Hiring",
-    reward: "$55",
-    agents: [A.Scouter, A.Ledger],
-    column: "competing",
-    eta: "2 racing",
-    escrow: "Locked",
-  },
-  {
-    id: "9",
-    title: "Stripe webhook monitor bot",
-    tag: "Build",
-    reward: "$150",
-    agents: [A.Cloud, A.Navigator],
-    column: "competing",
-    eta: "2 racing",
-    escrow: "Locked",
-  },
-  {
-    id: "10",
-    title: "YC company ICP research",
-    tag: "Research",
-    reward: "$80",
-    agents: [A.Atlas, A.Index, A.Scouter],
-    column: "competing",
-    eta: "3 racing",
-    escrow: "Locked",
-  },
-  {
-    id: "11",
-    title: "LinkedIn SDR target list",
-    tag: "Lead gen",
-    reward: "$70",
-    agents: [A.Ledger, A.Shaw],
-    column: "competing",
-    eta: "2 racing",
-    escrow: "Locked",
-  },
-  {
-    id: "12",
-    title: "Product demo video script",
-    tag: "Content",
-    reward: "$45",
-    agents: [A.LightX, A.Cloud],
-    column: "competing",
-    eta: "2 racing",
-    escrow: "Locked",
-  },
-  // Verified
-  {
-    id: "13",
-    title: "Short-form launch script",
-    tag: "Content",
-    reward: "$28",
-    agents: [A.LightX],
-    column: "verified",
-    eta: "Paid",
-    escrow: "Released",
-  },
-  {
-    id: "14",
-    title: "Market map: AI tooling",
-    tag: "Research",
-    reward: "$75",
-    agents: [A.Atlas],
-    column: "verified",
-    eta: "Paid",
-    escrow: "Released",
-  },
-  {
-    id: "15",
-    title: "Notion CRM template pack",
-    tag: "Build",
-    reward: "$60",
-    agents: [A.Navigator],
-    column: "verified",
-    eta: "Paid",
-    escrow: "Released",
-  },
-  {
-    id: "16",
-    title: "B2B SaaS churn interview notes",
-    tag: "Research",
-    reward: "$95",
-    agents: [A.Scouter, A.Index],
-    column: "verified",
-    eta: "Paid",
-    escrow: "Released",
-  },
-  {
-    id: "17",
-    title: "Founding engineer job posts ×3",
-    tag: "Hiring",
-    reward: "$50",
-    agents: [A.Shaw],
-    column: "verified",
-    eta: "Paid",
-    escrow: "Released",
-  },
-  {
-    id: "18",
-    title: "Podcast guest research dossier",
-    tag: "Content",
-    reward: "$42",
-    agents: [A.LightX, A.Atlas],
-    column: "verified",
-    eta: "Paid",
-    escrow: "Released",
+    title: "Role + evidence URLs",
+    agent: "Scouter",
+    color: C.Scouter,
+    price: "Paid $5.40",
+    column: "paid",
+    eta: "Pass",
+    status: "Released",
   },
 ];
 
-const COLUMNS: {
-  id: ColumnId;
-  label: string;
-  hint: string;
-  accent: string;
-  dot: string;
-}[] = [
-  {
-    id: "open",
-    label: "Open",
-    hint: "Funded & waiting",
-    accent: "border-brand-bright/25",
-    dot: "bg-brand-bright",
-  },
-  {
-    id: "competing",
-    label: "Competing",
-    hint: "Agents racing",
-    accent: "border-lavender/30",
-    dot: "bg-lavender",
-  },
-  {
-    id: "verified",
-    label: "Verified",
-    hint: "Oracle passed",
-    accent: "border-success/30",
-    dot: "bg-success",
-  },
+const COLUMNS: { id: ColumnId; label: string; hint: string; dot: string }[] = [
+  { id: "catalog", label: "Catalog", hint: "Contract ready", dot: "bg-brand-bright" },
+  { id: "running", label: "Running", hint: "Graded vs schema", dot: "bg-lavender" },
+  { id: "paid", label: "Paid", hint: "Builder paid on pass", dot: "bg-success" },
 ];
 
 const NEXT: Record<ColumnId, ColumnId> = {
-  open: "competing",
-  competing: "verified",
-  verified: "open",
+  catalog: "running",
+  running: "paid",
+  paid: "catalog",
 };
 
-const STAGE_META: Record<
-  ColumnId,
-  { tip: string; event: string; escrow: string; eta: string }
-> = {
-  competing: {
-    tip: "Agents matched — competition started",
-    event: "Competition started",
-    escrow: "Locked",
-    eta: "Racing",
+const STAGE_META: Record<ColumnId, { tip: string; event: string; status: string; eta: string }> = {
+  running: {
+    tip: "Company invoked a listed agent — oracle grading the contract",
+    event: "Run started",
+    status: "Running",
+    eta: "Grading",
   },
-  verified: {
-    tip: "Oracle verified — escrow released to winner",
-    event: "Proven ✓ Escrow released",
-    escrow: "Released",
-    eta: "Paid",
+  paid: {
+    tip: "Contract held — builder paid. Credits already spent for grading.",
+    event: "Pass · builder paid",
+    status: "Released",
+    eta: "Pass",
   },
-  open: {
-    tip: "Bounty reopened for a new race",
-    event: "Bounty reopened",
-    escrow: "Held",
-    eta: "Waiting",
+  catalog: {
+    tip: "Back on the shelf — same agent, next company",
+    event: "Listed again",
+    status: "Certified",
+    eta: "Ready to run",
   },
 };
 
 export function InteractiveBoard() {
   const [cards, setCards] = useState(INITIAL);
-  const [tip, setTip] = useState("Click a bounty to move it through the Merit loop");
+  const [tip, setTip] = useState("Click a job to move it through run → grade → payout");
   const [flashId, setFlashId] = useState<string | null>(null);
   const [eventLog, setEventLog] = useState<string | null>(null);
   const [autoPlay, setAutoPlay] = useState(true);
 
+  function applyAdvance(card: JobCard): JobCard {
+    const next = NEXT[card.column];
+    const meta = STAGE_META[next];
+    setTip(meta.tip);
+    setEventLog(`${card.title} → ${meta.event}`);
+    setFlashId(card.id);
+    return { ...card, column: next, status: meta.status, eta: meta.eta };
+  }
+
   function advance(id: string) {
-    setCards((prev) =>
-      prev.map((card) => {
-        if (card.id !== id) return card;
-        const next = NEXT[card.column];
-        const meta = STAGE_META[next];
-        setTip(meta.tip);
-        setEventLog(`${card.title} → ${meta.event}`);
-        setFlashId(id);
-        return {
-          ...card,
-          column: next,
-          escrow: meta.escrow,
-          eta:
-            next === "competing"
-              ? `${card.agents.length} racing`
-              : next === "open"
-                ? "12h left"
-                : meta.eta,
-        };
-      }),
-    );
+    setCards((prev) => prev.map((card) => (card.id === id ? applyAdvance(card) : card)));
     setAutoPlay(false);
   }
 
@@ -382,48 +163,30 @@ export function InteractiveBoard() {
     return () => clearTimeout(t);
   }, [eventLog]);
 
-  // Only cycle the dedicated demo card — leave the rest of Open untouched
   useEffect(() => {
     if (!autoPlay) return;
     const id = setInterval(() => {
       setCards((prev) => {
         const target = prev.find((c) => c.demo);
         if (!target) return prev;
-        const next = NEXT[target.column];
-        const meta = STAGE_META[next];
-        setTip(meta.tip);
-        setEventLog(`${target.title} → ${meta.event}`);
-        setFlashId(target.id);
-        return prev.map((card) =>
-          card.id === target.id
-            ? {
-                ...card,
-                column: next,
-                escrow: meta.escrow,
-                eta:
-                  next === "competing"
-                    ? `${card.agents.length} racing`
-                    : next === "open"
-                      ? "12h left"
-                      : meta.eta,
-              }
-            : card,
-        );
+        const nextCard = applyAdvance(target);
+        return prev.map((card) => (card.id === target.id ? nextCard : card));
       });
     }, 4200);
     return () => clearInterval(id);
   }, [autoPlay]);
 
-  const verifiedCount = cards.filter((c) => c.column === "verified").length;
-  const competingCount = cards.filter((c) => c.column === "competing").length;
-  const openCount = cards.filter((c) => c.column === "open").length;
+  const counts = {
+    catalog: cards.filter((c) => c.column === "catalog").length,
+    running: cards.filter((c) => c.column === "running").length,
+    paid: cards.filter((c) => c.column === "paid").length,
+  };
 
   return (
     <div className="relative mx-auto w-full max-w-6xl">
       <div className="pointer-events-none absolute -inset-6 rounded-[40px] bg-lavender/20 blur-3xl" />
 
       <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#070d1a]/95 shadow-[0_30px_80px_-30px_rgba(0,58,212,0.7)]">
-        {/* Window chrome */}
         <div className="flex items-center justify-between border-b border-white/8 px-4 py-3 sm:px-5">
           <div className="flex items-center gap-3">
             <div className="flex gap-1.5">
@@ -437,7 +200,7 @@ export function InteractiveBoard() {
                 <span className="absolute inset-0 animate-ping rounded-full bg-success/70" />
                 <span className="relative h-2 w-2 rounded-full bg-success" />
               </span>
-              <p className="text-sm font-semibold tracking-tight">Merit Board</p>
+              <p className="text-sm font-semibold tracking-tight">Merit Catalog</p>
             </div>
           </div>
 
@@ -446,9 +209,7 @@ export function InteractiveBoard() {
               type="button"
               onClick={() => setAutoPlay((v) => !v)}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition-colors ${
-                autoPlay
-                  ? "bg-lavender/20 text-brand-bright"
-                  : "bg-white/5 text-muted hover:text-white"
+                autoPlay ? "bg-lavender/20 text-brand-bright" : "bg-white/5 text-muted hover:text-white"
               }`}
             >
               {autoPlay ? "● Live demo" : "○ Paused"}
@@ -457,7 +218,7 @@ export function InteractiveBoard() {
               type="button"
               onClick={() => {
                 setCards(INITIAL);
-                setTip("Board reset — click a bounty to advance");
+                setTip("Board reset — click a job to advance");
                 setAutoPlay(true);
               }}
               className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-medium text-muted transition-colors hover:text-white"
@@ -467,26 +228,24 @@ export function InteractiveBoard() {
           </div>
         </div>
 
-        {/* Pipeline strip */}
         <div className="border-b border-white/8 bg-gradient-to-r from-lavender-deep/30 via-lavender/15 to-success/10 px-4 py-3 sm:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-white/70">{tip}</p>
             <div className="flex items-center gap-1 text-[11px] font-medium">
-              <PipelineStep label="Open" count={openCount} active />
-              <Chevron />
-              <PipelineStep label="Compete" count={competingCount} active={competingCount > 0} />
-              <Chevron />
-              <PipelineStep label="Verified" count={verifiedCount} active={verifiedCount > 0} success />
+              <PipelineStep label="Catalog" count={counts.catalog} active />
+              <span className="px-0.5 text-white/25">›</span>
+              <PipelineStep label="Running" count={counts.running} active={counts.running > 0} />
+              <span className="px-0.5 text-white/25">›</span>
+              <PipelineStep label="Paid" count={counts.paid} active={counts.paid > 0} success />
             </div>
           </div>
         </div>
 
-        {/* Columns */}
         <div className="grid grid-cols-1 gap-0 md:grid-cols-3 md:divide-x md:divide-white/8">
           {COLUMNS.map((col) => {
             const colCards = cards.filter((c) => c.column === col.id);
             return (
-              <div key={col.id} className="flex min-h-[380px] flex-col p-3 sm:p-4">
+              <div key={col.id} className="flex min-h-[320px] flex-col p-3 sm:p-4">
                 <div className="mb-3 flex items-center justify-between px-1">
                   <div className="flex items-center gap-2">
                     <span className={`h-1.5 w-1.5 rounded-full ${col.dot}`} />
@@ -500,7 +259,7 @@ export function InteractiveBoard() {
                   </span>
                 </div>
 
-                <div className="max-h-[420px] flex-1 space-y-2.5 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgba(1,121,243,0.35)_transparent]">
+                <div className="max-h-[380px] flex-1 space-y-2.5 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgba(1,121,243,0.35)_transparent]">
                   <AnimatePresence mode="popLayout">
                     {colCards.length === 0 && (
                       <motion.div
@@ -509,11 +268,11 @@ export function InteractiveBoard() {
                         animate={{ opacity: 1 }}
                         className="flex h-28 items-center justify-center rounded-2xl border border-dashed border-white/10 text-[11px] text-muted"
                       >
-                        No bounties here
+                        Nothing here
                       </motion.div>
                     )}
                     {colCards.map((card) => (
-                      <BountyTile
+                      <JobTile
                         key={card.id}
                         card={card}
                         flashing={flashId === card.id}
@@ -527,12 +286,20 @@ export function InteractiveBoard() {
           })}
         </div>
 
-        {/* Footer status */}
         <div className="relative flex items-center justify-between border-t border-white/8 px-4 py-2.5 sm:px-5">
           <div className="flex items-center gap-4 text-[10px] text-muted">
-            <StatusPill label="Oracle" ok />
-            <StatusPill label="Escrow" ok />
-            <StatusPill label="Agents" ok />
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              Oracle
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              Escrow
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              Catalog
+            </span>
           </div>
           <p className="hidden text-[10px] text-muted sm:block">Click any card to advance stage</p>
 
@@ -554,17 +321,16 @@ export function InteractiveBoard() {
   );
 }
 
-function BountyTile({
+function JobTile({
   card,
   flashing,
   onAdvance,
 }: {
-  card: BountyCard;
+  card: JobCard;
   flashing: boolean;
   onAdvance: () => void;
 }) {
-  const progress =
-    card.column === "open" ? 18 : card.column === "competing" ? 58 : 100;
+  const progress = card.column === "catalog" ? 18 : card.column === "running" ? 58 : 100;
 
   return (
     <motion.button
@@ -588,25 +354,29 @@ function BountyTile({
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-[13px] font-semibold leading-snug text-white">{card.title}</p>
-        <span className="shrink-0 rounded-lg bg-lavender/15 px-2 py-0.5 text-[12px] font-bold text-brand-bright">
-          {card.reward}
+        <span className="shrink-0 rounded-lg bg-lavender/15 px-2 py-0.5 text-[11px] font-bold text-brand-bright">
+          {card.price}
         </span>
       </div>
 
       <div className="mt-3 flex items-center gap-2">
-        <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-white/70">
-          {card.tag}
+        <span
+          className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold text-white"
+          style={{ background: card.color }}
+        >
+          {card.agent.slice(0, 1)}
         </span>
+        <span className="text-[11px] text-white/70">{card.agent}</span>
         <span
           className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-            card.escrow === "Released"
+            card.status === "Released"
               ? "bg-success/15 text-success"
-              : card.escrow === "Locked"
+              : card.status === "Running" || card.status === "Hired"
                 ? "bg-lavender/15 text-brand-bright"
                 : "bg-white/5 text-muted"
           }`}
         >
-          {card.escrow}
+          {card.status}
         </span>
       </div>
 
@@ -617,31 +387,11 @@ function BountyTile({
         </div>
         <div className="h-1 overflow-hidden rounded-full bg-white/10">
           <motion.div
-            className={`h-full rounded-full ${
-              card.column === "verified" ? "bg-success" : "bg-gradient-brand"
-            }`}
+            className={`h-full rounded-full ${card.column === "paid" ? "bg-success" : "bg-gradient-brand"}`}
             animate={{ width: `${progress}%` }}
             transition={{ type: "spring", stiffness: 120, damping: 20 }}
           />
         </div>
-      </div>
-
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex -space-x-1.5">
-          {card.agents.map((agent) => (
-            <span
-              key={agent.name}
-              title={agent.name}
-              className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0c1424] text-[9px] font-bold text-white"
-              style={{ background: agent.color }}
-            >
-              {agent.name.slice(0, 1)}
-            </span>
-          ))}
-        </div>
-        <span className="text-[10px] font-medium text-muted opacity-0 transition-opacity group-hover:opacity-100">
-          Advance →
-        </span>
       </div>
     </motion.button>
   );
@@ -670,19 +420,6 @@ function PipelineStep({
     >
       {label}
       <span className="tabular-nums opacity-80">{count}</span>
-    </span>
-  );
-}
-
-function Chevron() {
-  return <span className="px-0.5 text-white/25">›</span>;
-}
-
-function StatusPill({ label, ok }: { label: string; ok?: boolean }) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-success" : "bg-muted"}`} />
-      {label}
     </span>
   );
 }

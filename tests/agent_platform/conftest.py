@@ -7,6 +7,19 @@ from services.agent_platform.service import AgentPlatformService
 from services.agent_platform.webhook_notifier import WebhookNotifier
 
 
+@pytest.fixture(autouse=True)
+def reset_template_catalog():
+    from services.agent_platform import templates as t
+
+    snapshot = dict(t.TEMPLATES)
+    versions = dict(t._current_version)
+    yield
+    t.TEMPLATES.clear()
+    t.TEMPLATES.update(snapshot)
+    t._current_version.clear()
+    t._current_version.update(versions)
+
+
 class FakeWebhookTransport:
     """In-memory transport for testing matching/delivery without real HTTP calls.
     Set `fail_times` to simulate N consecutive failures before succeeding, or

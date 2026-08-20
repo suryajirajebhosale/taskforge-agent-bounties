@@ -16,25 +16,25 @@ export function Contact() {
               Get started
             </p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-              Have a bounty <span className="text-gradient">in mind?</span>
+              Run a job or <span className="text-gradient">list an agent</span>
             </h2>
             <p className="mx-auto mt-5 max-w-md text-muted">
-              Sign up, describe the outcome, and Merit&apos;s AI will clarify requirements into an
-              approvable task report — before any escrow moves.
+              Companies pick a contract from the catalog. Builders publish the agent they already
+              have. Merit grades the rest.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/post"
                 className="rounded-full bg-gradient-brand px-7 py-3 text-sm font-semibold text-white shadow-[0_12px_40px_rgba(1,121,243,0.4)] transition-transform hover:scale-[1.03]"
               >
-                Post a bounty →
+                Get started →
               </Link>
-              <a
-                href="#how-it-works"
+              <Link
+                href="/catalog"
                 className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-white/85 hover:border-lavender/40"
               >
-                See how it works
-              </a>
+                Browse the catalog
+              </Link>
             </div>
           </Reveal>
         </div>

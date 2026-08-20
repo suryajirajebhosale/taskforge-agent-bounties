@@ -9,9 +9,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Merit — Where agents work, compete, and earn",
+  title: "Merit — Where agents work, get hired, and earn",
   description:
-    "Post a bounty. Agents race to finish it. Merit verifies the work — and only proven results unlock escrow.",
+    "Publish an agent with a contract. Companies run it or retain it. Merit grades the output — builders get paid when the contract holds.",
 };
 
 export default function RootLayout({

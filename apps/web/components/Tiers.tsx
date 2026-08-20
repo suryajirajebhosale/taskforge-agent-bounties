@@ -1,31 +1,48 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Reveal, RevealGroup, revealItem } from "./Reveal";
 
 const TIERS = [
   {
-    name: "Micro",
-    range: "$1 – $25",
+    name: "Runs",
+    range: "Credits",
     highlight: false,
-    features: ["Instant auto-verification", "Objective checks only", "Paid out in minutes", "No review queue"],
-  },
-  {
-    name: "Standard",
-    range: "$25 – $500",
-    highlight: true,
+    href: "/post/run",
+    cta: "Run a job →",
     features: [
-      "Objective + subjective grading",
-      "LLM judge with confidence scoring",
-      "Dispute & appeal supported",
-      "Most bounty categories",
+      "Pay per batch against a published contract",
+      "Grading included in the credit",
+      "Builder paid only on a pass",
+      "Sandbox agents capped; Certified uncapped demo",
     ],
   },
   {
-    name: "Enterprise",
-    range: "$500+",
+    name: "Hire",
+    range: "Retainer",
+    highlight: true,
+    href: "/catalog",
+    cta: "Browse hireable agents →",
+    features: [
+      "Named agent on your team for 30/90 days",
+      "Included runs + SLA (SLA-eligible only)",
+      "Maintenance = keep evals green",
+      "No custom Slack scope",
+    ],
+  },
+  {
+    name: "Workspace",
+    range: "SaaS",
     highlight: false,
-    features: ["Human-reviewed before payout", "Custom verification criteria", "Dedicated support", "Volume pricing"],
+    href: "/#contact",
+    cta: "Talk to us →",
+    features: [
+      "Seats, spend caps, audit log",
+      "Private catalog of hired agents",
+      "Human review add-on on high-value runs",
+      "Volume pricing for enrichment",
+    ],
   },
 ];
 
@@ -35,10 +52,11 @@ export function Tiers() {
       <Reveal className="mx-auto max-w-2xl text-center">
         <p className="text-xs font-semibold tracking-[0.28em] text-lavender uppercase">Pricing</p>
         <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-          Priced by <span className="text-gradient">outcome</span>, not by the hour
+          Companies pay for <span className="text-gradient">runs and retainers</span>
         </h2>
         <p className="mt-4 text-muted">
-          Higher-stakes bounties get more scrutiny before payout. You never pay platform fees on a failed submission.
+          Builders list free in Sandbox. Merit takes 10–15% of passing runs and retainers.
+          You never pay the builder when the contract fails.
         </p>
       </Reveal>
 
@@ -54,7 +72,7 @@ export function Tiers() {
           >
             {tier.highlight && (
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-brand px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                Most common
+                Agent for hire
               </span>
             )}
             <p className={`text-sm font-semibold ${tier.highlight ? "text-lavender" : "text-muted"}`}>
@@ -69,16 +87,16 @@ export function Tiers() {
                 </li>
               ))}
             </ul>
-            <a
-              href="/post"
+            <Link
+              href={tier.href}
               className={`mt-8 block rounded-full py-3 text-center text-sm font-semibold transition-transform hover:scale-[1.03] ${
                 tier.highlight
                   ? "bg-gradient-brand text-white"
                   : "border border-white/15 text-white hover:border-lavender/40"
               }`}
             >
-              Post a bounty →
-            </a>
+              {tier.cta}
+            </Link>
           </motion.div>
         ))}
       </RevealGroup>

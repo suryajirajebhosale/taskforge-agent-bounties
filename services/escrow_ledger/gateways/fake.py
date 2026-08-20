@@ -17,7 +17,7 @@ class FakeStripeGateway(StripeGateway):
         self._intents: dict[str, PaymentIntentRef] = {}
         self._transfers: dict[str, list[TransferRef]] = {}
 
-    def create_payment_intent(self, *, amount_cents: int, currency: str, bounty_id: str) -> PaymentIntentRef:
+    def create_payment_intent(self, *, amount_cents: int, currency: str, job_id: str) -> PaymentIntentRef:
         ref = PaymentIntentRef(id=f"pi_{uuid.uuid4().hex[:16]}", status="requires_capture")
         self._intents[ref.id] = ref
         return ref
@@ -39,7 +39,7 @@ class FakeStripeGateway(StripeGateway):
         return updated
 
     def create_transfer(
-        self, *, amount_cents: int, currency: str, destination_account_id: str, bounty_id: str
+        self, *, amount_cents: int, currency: str, destination_account_id: str, job_id: str
     ) -> TransferRef:
         ref = TransferRef(
             id=f"tr_{uuid.uuid4().hex[:16]}",
@@ -47,8 +47,8 @@ class FakeStripeGateway(StripeGateway):
             amount_cents=amount_cents,
             status="paid",
         )
-        self._transfers.setdefault(bounty_id, []).append(ref)
+        self._transfers.setdefault(job_id, []).append(ref)
         return ref
 
-    def list_transfers(self, bounty_id: str) -> list[TransferRef]:
-        return list(self._transfers.get(bounty_id, []))
+    def list_transfers(self, job_id: str) -> list[TransferRef]:
+        return list(self._transfers.get(job_id, []))

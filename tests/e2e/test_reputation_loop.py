@@ -18,19 +18,19 @@ def _register_agent(agent_client, *, email, categories):
     return developer_id, body["agent"]["id"], body["api_key"]
 
 
-def _fund_match_submit(escrow_client, agent_client, *, bounty_id, category, api_key, amount_cents, payload):
+def _fund_match_submit(escrow_client, agent_client, *, job_id, category, agent_id, api_key, amount_cents, payload):
     escrow_client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": bounty_id, "requester_id": "req-rep", "amount_cents": amount_cents},
+        json={"job_id": job_id, "requester_id": "req-rep", "amount_cents": amount_cents},
         headers=ESCROW_HEADERS,
     )
     agent_client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": bounty_id, "category": category, "objective_schema": {}},
+        "/internal/jobs/fund",
+        json={"job_id": job_id, "agent_id": agent_id, "category": category, "objective_schema": {}},
         headers=AGENT_INTERNAL_HEADERS,
     )
     return agent_client.post(
-        "/submissions", json={"bounty_id": bounty_id, "payload": payload}, headers={"Authorization": f"Bearer {api_key}"}
+        "/submissions", json={"job_id": job_id, "payload": payload}, headers={"Authorization": f"Bearer {api_key}"}
     ).json()
 
 
@@ -38,27 +38,27 @@ def test_a_passing_verdict_raises_the_agents_rating_and_leaderboard_earnings(
     escrow_client, agent_client, oracle_client, reputation_client
 ):
     oracle_test_client, _judge, _dispute_judge = oracle_client
-    bounty_id = "e2e-rep-happy"
+    job_id = "e2e-rep-happy"
     category = "other"
     developer_id, agent_id, api_key = _register_agent(agent_client, email="dev-rep@example.com", categories=[category])
 
     assert reputation_client.get(f"/agents/{agent_id}/rating").json()["rating"] == 0.0
 
     submission = _fund_match_submit(
-        escrow_client, agent_client, bounty_id=bounty_id, category=category, api_key=api_key, amount_cents=1_000, payload={}
+        escrow_client, agent_client, job_id=job_id, category=category, agent_id=agent_id, api_key=api_key, amount_cents=1_000, payload={}
     )
 
     verify_resp = oracle_test_client.post(
         "/internal/verify",
         json={
             "submission_id": submission["id"],
-            "bounty_id": bounty_id,
+            "job_id": job_id,
             "agent_id": agent_id,
             "agent_developer_id": developer_id,
             "category": category,
             "requirement": {"objective_criteria": [], "subjective_criteria": [{"description": "quality", "weight": 1.0}]},
             "payload": {},
-            "bounty_amount_cents": 1_000,
+            "job_amount_cents": 1_000,
         },
         headers=ORACLE_INTERNAL_HEADERS,
     )
@@ -75,7 +75,7 @@ def test_a_passing_verdict_raises_the_agents_rating_and_leaderboard_earnings(
 
 def test_a_dispute_overturn_corrects_the_rating_through_oracle(escrow_client, agent_client, oracle_client, reputation_client):
     oracle_test_client, judge, dispute_judge = oracle_client
-    bounty_id = "e2e-rep-dispute"
+    job_id = "e2e-rep-dispute"
     category = "other"
     developer_id, agent_id, api_key = _register_agent(agent_client, email="dev-rep-2@example.com", categories=[category])
 
@@ -84,7 +84,7 @@ def test_a_dispute_overturn_corrects_the_rating_through_oracle(escrow_client, ag
     judge.verdict = JudgeVerdict(passed=False, confidence=0.9, rationale="initially judged as failing")
 
     submission = _fund_match_submit(
-        escrow_client, agent_client, bounty_id=bounty_id, category=category, api_key=api_key, amount_cents=2_000, payload={}
+        escrow_client, agent_client, job_id=job_id, category=category, agent_id=agent_id, api_key=api_key, amount_cents=2_000, payload={}
     )
     requirement = {"objective_criteria": [], "subjective_criteria": [{"description": "quality", "weight": 1.0}]}
 
@@ -92,13 +92,13 @@ def test_a_dispute_overturn_corrects_the_rating_through_oracle(escrow_client, ag
         "/internal/verify",
         json={
             "submission_id": submission["id"],
-            "bounty_id": bounty_id,
+            "job_id": job_id,
             "agent_id": agent_id,
             "agent_developer_id": developer_id,
             "category": category,
             "requirement": requirement,
             "payload": {},
-            "bounty_amount_cents": 2_000,
+            "job_amount_cents": 2_000,
         },
         headers=ORACLE_INTERNAL_HEADERS,
     )
@@ -135,6 +135,6 @@ def test_a_dispute_overturn_corrects_the_rating_through_oracle(escrow_client, ag
 
     # And escrow was released only once the dispute overturned it in the agent's favor.
     release_check = escrow_client.post(
-        f"/internal/escrow/{bounty_id}/release", json={"agent_developer_id": developer_id}, headers=ESCROW_HEADERS
+        f"/internal/escrow/{job_id}/release", json={"agent_developer_id": developer_id}, headers=ESCROW_HEADERS
     )
     assert release_check.json()["agent_developer_id"] == developer_id

@@ -40,7 +40,7 @@ INTERNAL_HEADERS = {"X-Internal-Api-Key": "rubric-test-secret"}
 def test_draft_approve_lock_flow_over_http(client):
     draft_resp = client.post(
         "/rubrics/draft",
-        json={"bounty_id": "b1", "bounty_description": "find 100 leads", "category": "sales_lead_generation"},
+        json={"job_id": "b1", "job_description": "find 100 leads", "category": "sales_lead_generation"},
     )
     assert draft_resp.status_code == 200
     assert draft_resp.json()["status"] == "draft"
@@ -60,7 +60,7 @@ def test_draft_approve_lock_flow_over_http(client):
 
 def test_lock_without_approval_returns_409(client):
     client.post(
-        "/rubrics/draft", json={"bounty_id": "b1", "bounty_description": "find leads", "category": "sales_lead_generation"}
+        "/rubrics/draft", json={"job_id": "b1", "job_description": "find leads", "category": "sales_lead_generation"}
     )
 
     resp = client.post("/internal/rubrics/b1/lock", headers=INTERNAL_HEADERS)
@@ -69,7 +69,7 @@ def test_lock_without_approval_returns_409(client):
 
 def test_lock_without_internal_key_is_rejected(client):
     client.post(
-        "/rubrics/draft", json={"bounty_id": "b1", "bounty_description": "find leads", "category": "sales_lead_generation"}
+        "/rubrics/draft", json={"job_id": "b1", "job_description": "find leads", "category": "sales_lead_generation"}
     )
     client.post("/rubrics/b1/approve")
 
@@ -79,7 +79,7 @@ def test_lock_without_internal_key_is_rejected(client):
 
 def test_update_after_lock_returns_409(client):
     client.post(
-        "/rubrics/draft", json={"bounty_id": "b1", "bounty_description": "find leads", "category": "sales_lead_generation"}
+        "/rubrics/draft", json={"job_id": "b1", "job_description": "find leads", "category": "sales_lead_generation"}
     )
     client.post("/rubrics/b1/approve")
     client.post("/internal/rubrics/b1/lock", headers=INTERNAL_HEADERS)

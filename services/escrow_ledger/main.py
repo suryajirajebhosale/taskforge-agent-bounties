@@ -44,23 +44,25 @@ def require_internal_caller(x_internal_api_key: str = Header(default="")) -> Non
 
 
 @app.post("/internal/escrow/fund", response_model=schemas.EscrowHoldOut, dependencies=[Depends(require_internal_caller)])
-def fund_bounty(body: schemas.FundBountyRequest, service: EscrowLedgerService = Depends(get_service)):
-    return service.fund_bounty(
-        bounty_id=body.bounty_id,
+def fund_job(body: schemas.FundJobRequest, service: EscrowLedgerService = Depends(get_service)):
+    return service.fund_job(
+        job_id=body.job_id,
         requester_id=body.requester_id,
         amount_cents=body.amount_cents,
         take_rate_bps=body.take_rate_bps,
+        job_kind=body.job_kind,
+        grading_fee_cents=body.grading_fee_cents,
     )
 
 
 @app.post(
-    "/internal/escrow/{bounty_id}/release",
+    "/internal/escrow/{job_id}/release",
     response_model=schemas.PayoutTransferOut,
     dependencies=[Depends(require_internal_caller)],
 )
-def release_to_agent(bounty_id: str, body: schemas.ReleaseRequest, service: EscrowLedgerService = Depends(get_service)):
+def release_to_agent(job_id: str, body: schemas.ReleaseRequest, service: EscrowLedgerService = Depends(get_service)):
     try:
-        return service.release_to_agent(bounty_id=bounty_id, agent_developer_id=body.agent_developer_id)
+        return service.release_to_agent(job_id=job_id, agent_developer_id=body.agent_developer_id)
     except HoldNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except InvalidHoldState as e:
@@ -68,13 +70,13 @@ def release_to_agent(bounty_id: str, body: schemas.ReleaseRequest, service: Escr
 
 
 @app.post(
-    "/internal/escrow/{bounty_id}/refund",
+    "/internal/escrow/{job_id}/refund",
     response_model=schemas.EscrowHoldOut,
     dependencies=[Depends(require_internal_caller)],
 )
-def refund_to_requester(bounty_id: str, service: EscrowLedgerService = Depends(get_service)):
+def refund_to_requester(job_id: str, service: EscrowLedgerService = Depends(get_service)):
     try:
-        return service.refund_to_requester(bounty_id=bounty_id)
+        return service.refund_to_requester(job_id=job_id)
     except HoldNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except InvalidHoldState as e:
@@ -87,9 +89,9 @@ def refund_to_requester(bounty_id: str, service: EscrowLedgerService = Depends(g
     dependencies=[Depends(require_internal_caller)],
 )
 def reconcile(body: schemas.ReconcileRequest, service: EscrowLedgerService = Depends(get_service)):
-    report = service.reconcile(body.bounty_ids)
+    report = service.reconcile(body.job_ids)
     return schemas.ReconciliationReportOut(
-        checked_bounty_ids=report.checked_bounty_ids,
+        checked_job_ids=report.checked_job_ids,
         mismatches=[schemas.ReconciliationMismatchOut(**m.__dict__) for m in report.mismatches],
         clean=report.clean,
     )

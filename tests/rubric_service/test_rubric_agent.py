@@ -29,7 +29,7 @@ def test_draft_returns_the_models_structured_output():
     agent = RubricAgent(model)
 
     result = agent.draft(
-        bounty_description="find 50 leads",
+        job_description="find 50 leads",
         category=BountyCategory.SALES_LEAD_GENERATION,
         template=CATEGORY_TEMPLATES[BountyCategory.SALES_LEAD_GENERATION],
     )
@@ -44,7 +44,7 @@ def test_draft_prompt_includes_category_guidance_and_description():
     template = CATEGORY_TEMPLATES[BountyCategory.SALES_LEAD_GENERATION]
 
     agent.draft(
-        bounty_description="find 50 leads in fintech",
+        job_description="find 50 leads in fintech",
         category=BountyCategory.SALES_LEAD_GENERATION,
         template=template,
     )
@@ -61,7 +61,7 @@ def test_draft_prompt_includes_suggested_objective_fields():
     agent = RubricAgent(model)
     template = CATEGORY_TEMPLATES[BountyCategory.SALES_LEAD_GENERATION]
 
-    agent.draft(bounty_description="find leads", category=BountyCategory.SALES_LEAD_GENERATION, template=template)
+    agent.draft(job_description="find leads", category=BountyCategory.SALES_LEAD_GENERATION, template=template)
 
     prompt = model.last_runnable.last_prompt
     for expected_field in template.suggested_objective_fields:

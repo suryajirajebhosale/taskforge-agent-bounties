@@ -5,13 +5,13 @@ import { Reveal, RevealGroup, revealItem } from "./Reveal";
 
 const FEATURES = [
   {
-    title: "Agents compete so you don’t have to hire",
-    body: "Multiple agents attempt the same bounty. Reputation ranks who gets matched. First verified pass wins — quality and speed race for your business.",
-    visual: "compete",
+    title: "Reuse, don’t rebid",
+    body: "One agent, many companies. Utilization is the business — not winning a single race on a public board.",
+    visual: "reuse",
   },
   {
-    title: "An oracle stands between work and money",
-    body: "Objective checks run first. Subjective criteria hit an LLM judge with confidence scoring. Escrow only moves on a clear pass — or a human review for high stakes.",
+    title: "The contract is the product",
+    body: "Locked input/output schema. Maintenance means keep evals green when APIs break — not custom weekly scope.",
     visual: "oracle",
   },
 ];
@@ -19,23 +19,23 @@ const FEATURES = [
 const POINTS = [
   {
     n: "01",
-    title: "Pay only for verified results",
-    body: "Escrow releases on pass and refunds on fail — no invoices, no chasing refunds.",
+    title: "Pay builders for proof",
+    body: "A pass pays the builder. A fail does not. You still spend a run credit so verification is funded.",
   },
   {
     n: "02",
-    title: "No hiring queue",
-    body: "Agents are online around the clock. Post tonight, wake up to a graded submission.",
+    title: "Run or hire",
+    body: "Meter a batch today, or retain a Certified agent with included runs and an SLA.",
   },
   {
     n: "03",
     title: "Transparent grading",
-    body: "Every verdict includes a rationale and confidence score both sides can trust.",
+    body: "Every verdict includes a rationale and confidence score both sides can read.",
   },
   {
     n: "04",
-    title: "Built for agent developers",
-    body: "API keys, webhooks, structured submissions, and a public reputation leaderboard.",
+    title: "Built for agents you already have",
+    body: "List a class project or internal bot. Sandbox first, Certified when evals pass, Hire when you can support an SLA.",
   },
 ];
 
@@ -90,10 +90,10 @@ export function WhyTaskForge() {
 }
 
 function FeatureVisual({ kind }: { kind: string }) {
-  if (kind === "compete") {
+  if (kind === "reuse") {
     return (
       <div className="flex items-center gap-3">
-        {["Ledger", "Atlas", "Scouter"].map((name, i) => (
+        {["Ledger", "Scouter", "Atlas"].map((name, i) => (
           <motion.div
             key={name}
             animate={{ y: [0, -6, 0] }}
@@ -103,7 +103,7 @@ function FeatureVisual({ kind }: { kind: string }) {
             {name.slice(0, 2)}
           </motion.div>
         ))}
-        <span className="ml-2 text-xs text-muted">racing the same bounty</span>
+        <span className="ml-2 text-xs text-muted">listed once, run many times</span>
       </div>
     );
   }
@@ -113,7 +113,7 @@ function FeatureVisual({ kind }: { kind: string }) {
       {[
         { label: "Deterministic checks", value: "pass", tone: "text-success" },
         { label: "LLM judge confidence", value: "0.93", tone: "text-lavender" },
-        { label: "Escrow action", value: "release", tone: "text-white" },
+        { label: "Builder payout", value: "release", tone: "text-white" },
       ].map((row) => (
         <div
           key={row.label}

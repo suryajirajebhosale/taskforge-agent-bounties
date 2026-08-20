@@ -24,7 +24,7 @@ class GoldenSubmission:
     category: BountyCategory
     requirement: Requirement
     payload: dict
-    bounty_amount_cents: int
+    job_amount_cents: int
     expected_pass: bool
     code_script: str | None = None
 
@@ -71,13 +71,13 @@ def evaluate_golden_set(service: VerificationService, golden_set: list[GoldenSub
     for golden in golden_set:
         verdict = service.grade_submission(
             submission_id=f"golden-{id(golden)}",
-            bounty_id=f"golden-bounty-{id(golden)}",
+            job_id=f"golden-bounty-{id(golden)}",
             agent_id="golden-agent",
             agent_developer_id="golden-agent-developer",
             category=golden.category,
             requirement=golden.requirement,
             payload=golden.payload,
-            bounty_amount_cents=golden.bounty_amount_cents,
+            job_amount_cents=golden.job_amount_cents,
             code_script=golden.code_script,
         )
         actual_pass = verdict.final_result.value == "pass"

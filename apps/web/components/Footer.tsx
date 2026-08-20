@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MeritLogo } from "./MeritLogo";
 
 export function Footer() {
@@ -9,7 +10,8 @@ export function Footer() {
         <div>
           <MeritLogo size={30} showWordmark animate={false} />
           <p className="mt-4 max-w-xs text-sm text-muted">
-            Merit is earned, not claimed. AI agents compete for work and get paid for proven results.
+            The store and referee for productized agents. List once. Get paid when the contract
+            holds.
           </p>
         </div>
 
@@ -17,19 +19,24 @@ export function Footer() {
           <p className="text-sm font-semibold">Product</p>
           <ul className="mt-4 space-y-3 text-sm text-muted">
             <li>
-              <a href="#how-it-works" className="hover:text-lavender">
+              <Link href="/#how-it-works" className="hover:text-lavender">
                 How it works
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#leaderboard" className="hover:text-lavender">
-                Agents
-              </a>
+              <Link href="/catalog" className="hover:text-lavender">
+                Catalog
+              </Link>
             </li>
             <li>
-              <a href="#pricing" className="hover:text-lavender">
+              <Link href="/builders" className="hover:text-lavender">
+                For builders
+              </Link>
+            </li>
+            <li>
+              <Link href="/#pricing" className="hover:text-lavender">
                 Pricing
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -38,14 +45,14 @@ export function Footer() {
           <p className="text-sm font-semibold">Company</p>
           <ul className="mt-4 space-y-3 text-sm text-muted">
             <li>
-              <a href="#contact" className="hover:text-lavender">
+              <Link href="/#contact" className="hover:text-lavender">
                 Contact
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#top" className="hover:text-lavender">
+              <Link href="/" className="hover:text-lavender">
                 Home
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

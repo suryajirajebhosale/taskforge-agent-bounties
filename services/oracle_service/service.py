@@ -53,13 +53,13 @@ class VerificationService:
         self,
         *,
         submission_id: str,
-        bounty_id: str,
+        job_id: str,
         agent_id: str,
         agent_developer_id: str,
         category: BountyCategory,
         requirement: Requirement,
         payload: dict,
-        bounty_amount_cents: int,
+        job_amount_cents: int,
         code_script: str | None = None,
     ) -> Verdict:
         stage_results: dict = {}
@@ -93,14 +93,14 @@ class VerificationService:
 
         final_result, confidence, rationale = self._combine(deterministic, judge_verdict)
 
-        routing = route(confidence=confidence, bounty_amount_cents=bounty_amount_cents, config=self.routing_config)
+        routing = route(confidence=confidence, job_amount_cents=job_amount_cents, config=self.routing_config)
 
         verdict = Verdict(
             submission_id=submission_id,
-            bounty_id=bounty_id,
+            job_id=job_id,
             agent_id=agent_id,
             agent_developer_id=agent_developer_id,
-            bounty_amount_cents=bounty_amount_cents,
+            job_amount_cents=job_amount_cents,
             stage_results=stage_results,
             final_result=final_result,
             confidence=confidence,
@@ -202,7 +202,7 @@ class VerificationService:
         agent_platform_status = None
         if self.agent_platform_client is not None:
             response = self.agent_platform_client.record_verdict(
-                bounty_id=verdict.bounty_id, submission_id=verdict.submission_id, passed=passed
+                job_id=verdict.job_id, submission_id=verdict.submission_id, passed=passed
             )
             agent_platform_status = response.get("status")
 
@@ -212,7 +212,7 @@ class VerificationService:
         # wins bookkeeping is the authority on that — if it reports this submission as
         # moot, skip the payout even though Oracle's own verdict was a pass.
         if passed and self.escrow_client is not None and agent_platform_status != "moot":
-            self.escrow_client.release_to_agent(bounty_id=verdict.bounty_id, agent_developer_id=verdict.agent_developer_id)
+            self.escrow_client.release_to_agent(job_id=verdict.job_id, agent_developer_id=verdict.agent_developer_id)
 
     def _record_reputation_outcome(self, verdict: Verdict) -> None:
         if self.reputation_client is None:
@@ -222,7 +222,7 @@ class VerificationService:
             agent_id=verdict.agent_id,
             agent_developer_id=verdict.agent_developer_id,
             passed=verdict.final_result == FinalResult.PASS,
-            bounty_amount_cents=verdict.bounty_amount_cents,
+            job_amount_cents=verdict.job_amount_cents,
         )
 
     def _correct_reputation_outcome(self, verdict: Verdict) -> None:
@@ -233,7 +233,7 @@ class VerificationService:
             agent_id=verdict.agent_id,
             agent_developer_id=verdict.agent_developer_id,
             passed=verdict.final_result == FinalResult.PASS,
-            bounty_amount_cents=verdict.bounty_amount_cents,
+            job_amount_cents=verdict.job_amount_cents,
         )
 
     def _require_verdict(self, verdict_id: str) -> Verdict:

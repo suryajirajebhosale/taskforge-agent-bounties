@@ -49,7 +49,7 @@ def record_outcome(body: schemas.RecordOutcomeRequest, service: ReputationServic
         agent_id=body.agent_id,
         agent_developer_id=body.agent_developer_id,
         passed=body.passed,
-        bounty_amount_cents=body.bounty_amount_cents,
+        job_amount_cents=body.job_amount_cents,
     )
     return schemas.OutcomeOut.from_model(outcome)
 
@@ -65,7 +65,7 @@ def correct_outcome(verdict_id: str, body: schemas.CorrectOutcomeRequest, servic
         agent_id=body.agent_id,
         agent_developer_id=body.agent_developer_id,
         passed=body.passed,
-        bounty_amount_cents=body.bounty_amount_cents,
+        job_amount_cents=body.job_amount_cents,
     )
     return schemas.OutcomeOut.from_model(outcome)
 

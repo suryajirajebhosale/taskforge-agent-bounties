@@ -15,8 +15,8 @@ class FakeRubricDrafter:
         self.requirement = requirement or _default_requirement()
         self.calls: list[dict] = []
 
-    def draft(self, *, bounty_description, category, template):
-        self.calls.append({"bounty_description": bounty_description, "category": category, "template": template})
+    def draft(self, *, job_description, category, template):
+        self.calls.append({"job_description": job_description, "category": category, "template": template})
         return self.requirement
 
 

@@ -13,7 +13,7 @@ GOLDEN_DATASET: list[GoldenSubmission] = [
         category=BountyCategory.SALES_LEAD_GENERATION,
         requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="lead_count", comparator=">=", value=100)]),
         payload={"lead_count": 120},
-        bounty_amount_cents=2_000,
+        job_amount_cents=2_000,
         expected_pass=True,
     ),
     GoldenSubmission(
@@ -21,7 +21,7 @@ GOLDEN_DATASET: list[GoldenSubmission] = [
         category=BountyCategory.SALES_LEAD_GENERATION,
         requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="lead_count", comparator=">=", value=100)]),
         payload={"lead_count": 40},
-        bounty_amount_cents=2_000,
+        job_amount_cents=2_000,
         expected_pass=False,
     ),
     GoldenSubmission(
@@ -29,7 +29,7 @@ GOLDEN_DATASET: list[GoldenSubmission] = [
         category=BountyCategory.SALES_LEAD_GENERATION,
         requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="lead_count", comparator=">=", value=100)]),
         payload={},
-        bounty_amount_cents=2_000,
+        job_amount_cents=2_000,
         expected_pass=False,
     ),
     GoldenSubmission(
@@ -37,7 +37,7 @@ GOLDEN_DATASET: list[GoldenSubmission] = [
         category=BountyCategory.RESEARCH_COMPETITIVE_INTELLIGENCE,
         requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="entry_count", comparator=">=", value=10)]),
         payload={"entry_count": 10},
-        bounty_amount_cents=1_500,
+        job_amount_cents=1_500,
         expected_pass=True,
     ),
 ]

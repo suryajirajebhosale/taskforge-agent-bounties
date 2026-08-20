@@ -157,7 +157,7 @@ def test_escrow_ledger_service_can_actually_fund_a_bounty_against_the_real_db_fi
 
     session = Session(bind=engine)
     service = EscrowLedgerService(session=session, gateway=FakeStripeGateway())
-    hold = service.fund_bounty(bounty_id="smoke-1", requester_id="req1", amount_cents=1_000)
+    hold = service.fund_job(job_id="smoke-1", requester_id="req1", amount_cents=1_000)
 
     assert hold.status.value == "held"
     session.close()
@@ -176,14 +176,14 @@ def test_rubric_service_can_actually_draft_a_requirement_against_the_real_db_fil
     session = Session(bind=engine)
 
     class _FakeDrafter:
-        def draft(self, *, bounty_description, category, template):
+        def draft(self, *, job_description, category, template):
             from services.rubric_service.requirement import ObjectiveCriterion, Requirement
 
             return Requirement(objective_criteria=[ObjectiveCriterion(field="lead_count", comparator=">=", value=100)])
 
     service = RubricGenerationService(session=session, drafter=_FakeDrafter())
     record = service.generate_draft(
-        bounty_id="smoke-1", bounty_description="find leads", category=BountyCategory.SALES_LEAD_GENERATION
+        job_id="smoke-1", job_description="find leads", category=BountyCategory.SALES_LEAD_GENERATION
     )
 
     assert record.status.value == "draft"
@@ -215,13 +215,13 @@ def test_oracle_service_can_actually_grade_a_submission_against_the_real_db_file
     )
     verdict = service.grade_submission(
         submission_id="smoke-1",
-        bounty_id="smoke-bounty-1",
+        job_id="smoke-bounty-1",
         agent_id="agent1",
         agent_developer_id="smoke-dev-1",
         category=BountyCategory.SALES_LEAD_GENERATION,
         requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="lead_count", comparator=">=", value=100)]),
         payload={"lead_count": 150},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.final_result.value == "pass"
@@ -240,7 +240,7 @@ def test_reputation_service_can_actually_record_an_outcome_against_the_real_db_f
     session = Session(bind=engine)
     service = ReputationService(session=session, decay_alpha=0.3, weekly_prize_amount_cents=2_500, week_start_day=6)
     service.record_outcome(
-        verdict_id="smoke-1", agent_id="smoke-agent-1", agent_developer_id="smoke-dev-1", passed=True, bounty_amount_cents=500
+        verdict_id="smoke-1", agent_id="smoke-agent-1", agent_developer_id="smoke-dev-1", passed=True, job_amount_cents=500
     )
 
     assert service.get_rating("smoke-agent-1") == 5.0

@@ -116,13 +116,13 @@ def require_internal_caller(x_internal_api_key: str = Header(default="")) -> Non
 def verify(body: schemas.GradeSubmissionRequest, service: VerificationService = Depends(get_service)):
     verdict = service.grade_submission(
         submission_id=body.submission_id,
-        bounty_id=body.bounty_id,
+        job_id=body.job_id,
         agent_id=body.agent_id,
         agent_developer_id=body.agent_developer_id,
         category=body.category,
         requirement=body.requirement,
         payload=body.payload,
-        bounty_amount_cents=body.bounty_amount_cents,
+        job_amount_cents=body.job_amount_cents,
         code_script=body.code_script,
     )
     return schemas.VerdictOut.from_model(verdict)

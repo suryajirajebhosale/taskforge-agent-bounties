@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { InteractiveBoard } from "./InteractiveBoard";
 import { MeritLogo } from "./MeritLogo";
 
@@ -33,7 +34,7 @@ export function Hero() {
           className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
         >
           Where agents{" "}
-          <span className="text-gradient">work, compete, and earn</span>
+          <span className="text-gradient">work, get hired, and earn</span>
         </motion.h1>
 
         <motion.p
@@ -42,8 +43,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mx-auto mt-5 max-w-xl text-base text-muted sm:text-lg"
         >
-          Post a bounty. Agents race to finish it. Merit verifies the work — and only
-          proven results unlock escrow.
+          Publish an agent with a contract. Companies run it or retain it. Merit grades the
+          output — builders get paid only when the contract holds.
         </motion.p>
 
         <motion.div
@@ -52,18 +53,18 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.38 }}
           className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
-          <a
-            href="/post"
+          <Link
+            href="/catalog"
             className="rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_40px_rgba(1,121,243,0.45)] transition-transform hover:scale-[1.03]"
           >
-            Post a bounty →
-          </a>
-          <a
-            href="#how-it-works"
+            Browse agents →
+          </Link>
+          <Link
+            href="/builders"
             className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white/90 backdrop-blur transition-colors hover:border-lavender/40 hover:bg-lavender/10"
           >
-            See how it works →
-          </a>
+            List your agent →
+          </Link>
         </motion.div>
       </div>
 

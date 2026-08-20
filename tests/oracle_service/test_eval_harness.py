@@ -18,7 +18,7 @@ def test_evaluate_golden_set_flags_a_false_positive(service):
             category=BountyCategory.OTHER,
             requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="x", comparator=">=", value=1)]),
             payload={"x": 5},
-            bounty_amount_cents=1_000,
+            job_amount_cents=1_000,
             expected_pass=False,
         )
     ]
@@ -37,7 +37,7 @@ def test_evaluate_golden_set_flags_a_false_negative(service):
             category=BountyCategory.OTHER,
             requirement=Requirement(objective_criteria=[ObjectiveCriterion(field="x", comparator=">=", value=100)]),
             payload={"x": 1},
-            bounty_amount_cents=1_000,
+            job_amount_cents=1_000,
             expected_pass=True,
         )
     ]

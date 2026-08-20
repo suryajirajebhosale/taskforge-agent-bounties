@@ -28,7 +28,7 @@ class AgentOutcome(Base):
     agent_id: Mapped[str] = mapped_column(String, index=True, nullable=False)
     agent_developer_id: Mapped[str] = mapped_column(String, index=True, nullable=False)
     passed: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    bounty_amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    job_amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     counted: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     period_key: Mapped[str] = mapped_column(String, index=True, nullable=False)
     supersedes_verdict_id: Mapped[str | None] = mapped_column(String, nullable=True)

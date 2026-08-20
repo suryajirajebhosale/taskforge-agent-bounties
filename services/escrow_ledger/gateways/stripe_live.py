@@ -11,13 +11,13 @@ class StripeGatewayLive(StripeGateway):
     def __init__(self, api_key: str) -> None:
         self._client = stripe.StripeClient(api_key)
 
-    def create_payment_intent(self, *, amount_cents: int, currency: str, bounty_id: str) -> PaymentIntentRef:
+    def create_payment_intent(self, *, amount_cents: int, currency: str, job_id: str) -> PaymentIntentRef:
         intent = self._client.payment_intents.create(
             params={
                 "amount": amount_cents,
                 "currency": currency,
                 "capture_method": "manual",
-                "metadata": {"bounty_id": bounty_id},
+                "metadata": {"job_id": job_id},
             }
         )
         return PaymentIntentRef(id=intent.id, status=intent.status)
@@ -31,14 +31,14 @@ class StripeGatewayLive(StripeGateway):
         return PaymentIntentRef(id=intent.id, status=intent.status)
 
     def create_transfer(
-        self, *, amount_cents: int, currency: str, destination_account_id: str, bounty_id: str
+        self, *, amount_cents: int, currency: str, destination_account_id: str, job_id: str
     ) -> TransferRef:
         transfer = self._client.transfers.create(
             params={
                 "amount": amount_cents,
                 "currency": currency,
                 "destination": destination_account_id,
-                "metadata": {"bounty_id": bounty_id},
+                "metadata": {"job_id": job_id},
             }
         )
         return TransferRef(
@@ -48,7 +48,7 @@ class StripeGatewayLive(StripeGateway):
             status="paid",
         )
 
-    def list_transfers(self, bounty_id: str) -> list[TransferRef]:
+    def list_transfers(self, job_id: str) -> list[TransferRef]:
         result = self._client.transfers.list(params={"limit": 100})
         return [
             TransferRef(
@@ -58,5 +58,5 @@ class StripeGatewayLive(StripeGateway):
                 status="paid",
             )
             for t in result.data
-            if t.metadata.get("bounty_id") == bounty_id
+            if t.metadata.get("job_id") == job_id
         ]

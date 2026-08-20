@@ -10,12 +10,12 @@ class RubricAgent(BaseLangChainAgent):
     improve objective-criteria extraction reliability, per the Bounty Requirement/
     Rubric Module PRD. Implements the `RubricDrafter` protocol structurally."""
 
-    def draft(self, *, bounty_description: str, category: BountyCategory, template: CategoryTemplate) -> Requirement:
-        prompt = self._build_prompt(bounty_description, category, template)
+    def draft(self, *, job_description: str, category: BountyCategory, template: CategoryTemplate) -> Requirement:
+        prompt = self._build_prompt(job_description, category, template)
         return self.generate_structured(prompt=prompt, output_schema=Requirement)
 
     @staticmethod
-    def _build_prompt(bounty_description: str, category: BountyCategory, template: CategoryTemplate) -> str:
+    def _build_prompt(job_description: str, category: BountyCategory, template: CategoryTemplate) -> str:
         lines = [
             f"You are drafting acceptance criteria for a bounty in the '{category.value}' category.",
             f"Guidance for this category: {template.guidance}",
@@ -27,7 +27,7 @@ class RubricAgent(BaseLangChainAgent):
         lines += [
             "",
             "Bounty description, in the requester's own words:",
-            bounty_description,
+            job_description,
             "",
             "Produce objective_criteria (machine-checkable, each with a field, a comparator, "
             "and a target value) and subjective_criteria (a weighted rubric whose weights "

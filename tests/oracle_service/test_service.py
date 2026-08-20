@@ -14,13 +14,13 @@ def test_objective_only_bounty_passes_without_invoking_the_judge(service, judge)
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.SALES_LEAD_GENERATION,
         requirement=requirement,
         payload={"lead_count": 150},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.final_result == FinalResult.PASS
@@ -36,13 +36,13 @@ def test_objective_failure_short_circuits_before_the_judge_runs(service, judge):
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.SALES_LEAD_GENERATION,
         requirement=requirement,
         payload={"lead_count": 10},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.final_result == FinalResult.FAIL
@@ -55,13 +55,13 @@ def test_subjective_criteria_invoke_the_judge(service, judge):
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.CONTENT_MEDIA,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert len(judge.calls) == 1
@@ -74,13 +74,13 @@ def test_judge_fail_produces_a_fail_verdict_with_its_own_confidence_and_rational
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.CONTENT_MEDIA,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.final_result == FinalResult.FAIL
@@ -93,13 +93,13 @@ def test_high_confidence_verdict_auto_resolves_and_notifies_downstream(service, 
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={"x": 5},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.resolved
@@ -114,13 +114,13 @@ def test_low_confidence_routes_to_human_and_skips_downstream_calls(service, judg
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert not verdict.resolved
@@ -134,13 +134,13 @@ def test_high_value_bounty_routes_to_human_even_with_full_confidence(service, es
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="big-bounty",
+        job_id="big-bounty",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={"x": 5},
-        bounty_amount_cents=999_999_999,
+        job_amount_cents=999_999_999,
     )
 
     assert not verdict.resolved
@@ -153,13 +153,13 @@ def test_failed_verdict_never_triggers_escrow_release(service, escrow_client, ag
 
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={"x": 1},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.final_result == FinalResult.FAIL
@@ -173,13 +173,13 @@ def test_human_review_resolves_a_routed_verdict_and_notifies_downstream(service,
     requirement = Requirement(subjective_criteria=[SubjectiveCriterion(description="x", weight=1.0)])
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
     assert not verdict.resolved
 
@@ -201,13 +201,13 @@ def test_raise_dispute_creates_an_independent_regrade(service, dispute_judge):
     requirement = Requirement(subjective_criteria=[SubjectiveCriterion(description="x", weight=1.0)])
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     service.raise_dispute(verdict_id=verdict.id, raised_by="dev1", payload={}, requirement=requirement)
@@ -227,13 +227,13 @@ def test_dispute_overturns_a_verdict_when_the_regrade_disagrees(service, judge, 
     requirement = Requirement(subjective_criteria=[SubjectiveCriterion(description="x", weight=1.0)])
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
     assert verdict.final_result == FinalResult.FAIL
 
@@ -253,13 +253,13 @@ def test_dispute_upholds_a_verdict_when_the_regrade_agrees(service, judge, dispu
     requirement = Requirement(subjective_criteria=[SubjectiveCriterion(description="x", weight=1.0)])
     verdict = service.grade_submission(
         submission_id="s1",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev1",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     dispute_judge.verdict = JudgeVerdict(passed=False, confidence=0.85, rationale="agree, still fails")
@@ -312,13 +312,13 @@ def test_escrow_is_not_released_when_agent_platform_reports_the_submission_as_mo
 
     verdict = service.grade_submission(
         submission_id="s2",
-        bounty_id="b1",
+        job_id="b1",
         agent_id="agent1",
         agent_developer_id="dev2",
         category=BountyCategory.OTHER,
         requirement=requirement,
         payload={"x": 5},
-        bounty_amount_cents=1_000,
+        job_amount_cents=1_000,
     )
 
     assert verdict.final_result == FinalResult.PASS  # Oracle's own grading did pass it

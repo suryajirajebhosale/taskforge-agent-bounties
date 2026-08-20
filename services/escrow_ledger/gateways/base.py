@@ -26,7 +26,7 @@ class StripeGateway(ABC):
     """
 
     @abstractmethod
-    def create_payment_intent(self, *, amount_cents: int, currency: str, bounty_id: str) -> PaymentIntentRef: ...
+    def create_payment_intent(self, *, amount_cents: int, currency: str, job_id: str) -> PaymentIntentRef: ...
 
     @abstractmethod
     def capture_payment_intent(self, payment_intent_id: str) -> PaymentIntentRef: ...
@@ -36,8 +36,8 @@ class StripeGateway(ABC):
 
     @abstractmethod
     def create_transfer(
-        self, *, amount_cents: int, currency: str, destination_account_id: str, bounty_id: str
+        self, *, amount_cents: int, currency: str, destination_account_id: str, job_id: str
     ) -> TransferRef: ...
 
     @abstractmethod
-    def list_transfers(self, bounty_id: str) -> list[TransferRef]: ...
+    def list_transfers(self, job_id: str) -> list[TransferRef]: ...

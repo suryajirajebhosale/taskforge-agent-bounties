@@ -10,7 +10,7 @@ class _ScriptedDrafter:
     def __init__(self, responses: dict[BountyCategory, Requirement]):
         self.responses = responses
 
-    def draft(self, *, bounty_description, category, template):
+    def draft(self, *, job_description, category, template):
         return self.responses[category]
 
 

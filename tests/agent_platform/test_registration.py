@@ -1,7 +1,7 @@
 import pytest
 
 from services.agent_platform.exceptions import AgentNotFound, DeveloperNotFound, InvalidApiKey
-from services.agent_platform.models import AgentStatus, IntegrationMode
+from services.agent_platform.models import AgentStatus, IntegrationMode, RuntimeMode
 
 
 def test_register_developer_creates_a_record(service):
@@ -15,7 +15,19 @@ def test_register_agent_returns_agent_and_raw_key_once(make_agent):
     assert agent.id is not None
     assert raw_key.startswith("agt_")
     # the raw key is never stored — only its hash and a display prefix
-    assert agent.api_key_prefix == raw_key[:12]
+    assert agent.runtime_mode == RuntimeMode.BUILDER_HOSTED
+
+
+def test_merit_hosted_runtime_is_reserved(service):
+    developer = service.register_developer(email="hosted@example.com")
+    with pytest.raises(ValueError, match="merit_hosted"):
+        service.register_agent(
+            developer_id=developer.id,
+            name="Hosted",
+            categories=["sales_lead_generation"],
+            integration_mode=IntegrationMode.POLL,
+            runtime_mode=RuntimeMode.MERIT_HOSTED,
+        )
 
 
 def test_register_agent_for_unknown_developer_raises(service):

@@ -16,10 +16,10 @@ class RequirementStatus(str, enum.Enum):
     APPROVED = "approved"
 
 
-class BountyRequirementRecord(Base):
-    __tablename__ = "bounty_requirements"
+class JobRequirementRecord(Base):
+    __tablename__ = "job_requirements"
 
-    bounty_id: Mapped[str] = mapped_column(String, primary_key=True)
+    job_id: Mapped[str] = mapped_column(String, primary_key=True)
     category: Mapped[str] = mapped_column(String, nullable=False)
     requirement_json: Mapped[dict] = mapped_column(JSON, nullable=False)
     status: Mapped[RequirementStatus] = mapped_column(Enum(RequirementStatus), default=RequirementStatus.DRAFT, nullable=False)

@@ -42,7 +42,7 @@ class ReputationService:
         agent_id: str,
         agent_developer_id: str,
         passed: bool,
-        bounty_amount_cents: int,
+        job_amount_cents: int,
         occurred_at: datetime | None = None,
     ) -> AgentOutcome:
         """Idempotent per `verdict_id` — replaying the same verdict is a no-op, so a
@@ -60,7 +60,7 @@ class ReputationService:
             agent_id=agent_id,
             agent_developer_id=agent_developer_id,
             passed=passed,
-            bounty_amount_cents=bounty_amount_cents,
+            job_amount_cents=job_amount_cents,
             counted=True,
             period_key=week_key(occurred_at, self.week_start_day),
             recorded_at=occurred_at,
@@ -76,7 +76,7 @@ class ReputationService:
         agent_id: str,
         agent_developer_id: str,
         passed: bool,
-        bounty_amount_cents: int,
+        job_amount_cents: int,
     ) -> AgentOutcome:
         """Used when a dispute overturns a verdict that was already recorded: excludes
         the original entry from rating/leaderboard computations (`counted=False`,
@@ -101,7 +101,7 @@ class ReputationService:
             agent_id=agent_id,
             agent_developer_id=agent_developer_id,
             passed=passed,
-            bounty_amount_cents=bounty_amount_cents,
+            job_amount_cents=job_amount_cents,
             counted=True,
             period_key=period_key,
             supersedes_verdict_id=verdict_id,
@@ -144,7 +144,7 @@ class ReputationService:
 
         totals: dict[str, int] = {}
         for outcome in query.all():
-            totals[outcome.agent_id] = totals.get(outcome.agent_id, 0) + outcome.bounty_amount_cents
+            totals[outcome.agent_id] = totals.get(outcome.agent_id, 0) + outcome.job_amount_cents
 
         ranked = sorted(totals.items(), key=lambda kv: kv[1], reverse=True)
         return [LeaderboardRow(agent_id=agent_id, verified_earnings_cents=total, rank=i + 1) for i, (agent_id, total) in enumerate(ranked)]
@@ -169,10 +169,10 @@ class ReputationService:
         agent_totals: dict[tuple[str, str], int] = {}
         for outcome in outcomes:
             developer_totals[outcome.agent_developer_id] = (
-                developer_totals.get(outcome.agent_developer_id, 0) + outcome.bounty_amount_cents
+                developer_totals.get(outcome.agent_developer_id, 0) + outcome.job_amount_cents
             )
             key = (outcome.agent_developer_id, outcome.agent_id)
-            agent_totals[key] = agent_totals.get(key, 0) + outcome.bounty_amount_cents
+            agent_totals[key] = agent_totals.get(key, 0) + outcome.job_amount_cents
 
         winner_developer_id = None
         winner_agent_id = None

@@ -42,10 +42,15 @@ class FakeDisputeJudge:
 class FakeEscrowClient:
     def __init__(self):
         self.release_calls: list[tuple[str, str]] = []
+        self.refund_calls: list[str] = []
 
-    def release_to_agent(self, *, bounty_id, agent_developer_id):
-        self.release_calls.append((bounty_id, agent_developer_id))
+    def release_to_agent(self, *, job_id, agent_developer_id):
+        self.release_calls.append((job_id, agent_developer_id))
         return {"status": "released"}
+
+    def refund_to_requester(self, *, job_id):
+        self.refund_calls.append(job_id)
+        return {"status": "refunded"}
 
 
 class FakeAgentPlatformClient:
@@ -57,8 +62,8 @@ class FakeAgentPlatformClient:
         self.record_calls: list[tuple[str, str, bool]] = []
         self._response = record_verdict_response or {"status": "graded"}
 
-    def record_verdict(self, *, bounty_id, submission_id, passed):
-        self.record_calls.append((bounty_id, submission_id, passed))
+    def record_verdict(self, *, job_id, submission_id, passed):
+        self.record_calls.append((job_id, submission_id, passed))
         return self._response
 
 
@@ -67,12 +72,12 @@ class FakeReputationClient:
         self.record_calls: list[tuple[str, str, str, bool, int]] = []
         self.correct_calls: list[tuple[str, str, str, bool, int]] = []
 
-    def record_outcome(self, *, verdict_id, agent_id, agent_developer_id, passed, bounty_amount_cents):
-        self.record_calls.append((verdict_id, agent_id, agent_developer_id, passed, bounty_amount_cents))
+    def record_outcome(self, *, verdict_id, agent_id, agent_developer_id, passed, job_amount_cents):
+        self.record_calls.append((verdict_id, agent_id, agent_developer_id, passed, job_amount_cents))
         return {"status": "recorded"}
 
-    def correct_outcome(self, *, verdict_id, agent_id, agent_developer_id, passed, bounty_amount_cents):
-        self.correct_calls.append((verdict_id, agent_id, agent_developer_id, passed, bounty_amount_cents))
+    def correct_outcome(self, *, verdict_id, agent_id, agent_developer_id, passed, job_amount_cents):
+        self.correct_calls.append((verdict_id, agent_id, agent_developer_id, passed, job_amount_cents))
         return {"status": "corrected"}
 
 

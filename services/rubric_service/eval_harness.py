@@ -57,7 +57,7 @@ def evaluate_golden_set(drafter: RubricDrafter, golden_set: list[GoldenExample])
         template = CATEGORY_TEMPLATES[example.category]
         try:
             requirement = drafter.draft(
-                bounty_description=example.description, category=example.category, template=template
+                job_description=example.description, category=example.category, template=template
             )
         except Exception as exc:  # noqa: BLE001 - a drafting failure is a failing result, not a harness crash
             results.append(GoldenResult(example=example, passed=False, missing_fields=set(), error=str(exc)))

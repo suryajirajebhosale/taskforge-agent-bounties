@@ -36,11 +36,11 @@ class Verdict(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
     submission_id: Mapped[str] = mapped_column(String, index=True, nullable=False)
-    bounty_id: Mapped[str] = mapped_column(String, index=True, nullable=False)
+    job_id: Mapped[str] = mapped_column(String, index=True, nullable=False)
     agent_id: Mapped[str] = mapped_column(String, index=True, nullable=False)
     agent_developer_id: Mapped[str] = mapped_column(String, nullable=False)
-    bounty_amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
-    """`agent_id`, `agent_developer_id`, and `bounty_amount_cents` are all denormalized
+    job_amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    """`agent_id`, `agent_developer_id`, and `job_amount_cents` are all denormalized
     so a later human-review or dispute resolution can still trigger the escrow payout
     and report the outcome to the Reputation & Leaderboard Module without needing to
     ask Agent Platform again."""

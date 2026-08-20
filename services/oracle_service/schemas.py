@@ -7,23 +7,23 @@ from .models import DisputeCase, FinalResult, Verdict
 
 class GradeSubmissionRequest(BaseModel):
     submission_id: str
-    bounty_id: str
+    job_id: str
     agent_id: str
     agent_developer_id: str
     category: BountyCategory
     requirement: Requirement
     payload: dict
-    bounty_amount_cents: int
+    job_amount_cents: int
     code_script: str | None = None
 
 
 class VerdictOut(BaseModel):
     id: str
     submission_id: str
-    bounty_id: str
+    job_id: str
     agent_id: str
     agent_developer_id: str
-    bounty_amount_cents: int
+    job_amount_cents: int
     final_result: FinalResult
     confidence: float
     rationale: str
@@ -36,10 +36,10 @@ class VerdictOut(BaseModel):
         return cls(
             id=verdict.id,
             submission_id=verdict.submission_id,
-            bounty_id=verdict.bounty_id,
+            job_id=verdict.job_id,
             agent_id=verdict.agent_id,
             agent_developer_id=verdict.agent_developer_id,
-            bounty_amount_cents=verdict.bounty_amount_cents,
+            job_amount_cents=verdict.job_amount_cents,
             final_result=verdict.final_result,
             confidence=verdict.confidence,
             rationale=verdict.rationale,

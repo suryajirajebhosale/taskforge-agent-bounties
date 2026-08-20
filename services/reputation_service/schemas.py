@@ -9,14 +9,14 @@ class RecordOutcomeRequest(BaseModel):
     agent_id: str
     agent_developer_id: str
     passed: bool
-    bounty_amount_cents: int
+    job_amount_cents: int
 
 
 class CorrectOutcomeRequest(BaseModel):
     agent_id: str
     agent_developer_id: str
     passed: bool
-    bounty_amount_cents: int
+    job_amount_cents: int
 
 
 class OutcomeOut(BaseModel):
@@ -24,7 +24,7 @@ class OutcomeOut(BaseModel):
     agent_id: str
     agent_developer_id: str
     passed: bool
-    bounty_amount_cents: int
+    job_amount_cents: int
     counted: bool
     period_key: str
     supersedes_verdict_id: str | None
@@ -36,7 +36,7 @@ class OutcomeOut(BaseModel):
             agent_id=outcome.agent_id,
             agent_developer_id=outcome.agent_developer_id,
             passed=outcome.passed,
-            bounty_amount_cents=outcome.bounty_amount_cents,
+            job_amount_cents=outcome.job_amount_cents,
             counted=outcome.counted,
             period_key=outcome.period_key,
             supersedes_verdict_id=outcome.supersedes_verdict_id,

@@ -55,17 +55,17 @@ def require_internal_caller(x_internal_api_key: str = Header(default="")) -> Non
 def generate_draft(body: schemas.GenerateDraftRequest, service: RubricGenerationService = Depends(get_service)):
     try:
         record = service.generate_draft(
-            bounty_id=body.bounty_id, bounty_description=body.bounty_description, category=body.category
+            job_id=body.job_id, job_description=body.job_description, category=body.category
         )
     except RequirementLocked as e:
         raise HTTPException(status_code=409, detail=str(e)) from e
     return schemas.RequirementRecordOut.from_record(record)
 
 
-@app.put("/rubrics/{bounty_id}", response_model=schemas.RequirementRecordOut)
-def update_draft(bounty_id: str, body: schemas.UpdateDraftRequest, service: RubricGenerationService = Depends(get_service)):
+@app.put("/rubrics/{job_id}", response_model=schemas.RequirementRecordOut)
+def update_draft(job_id: str, body: schemas.UpdateDraftRequest, service: RubricGenerationService = Depends(get_service)):
     try:
-        record = service.update_draft(bounty_id=bounty_id, requirement=body.requirement)
+        record = service.update_draft(job_id=job_id, requirement=body.requirement)
     except RequirementNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except RequirementLocked as e:
@@ -73,10 +73,10 @@ def update_draft(bounty_id: str, body: schemas.UpdateDraftRequest, service: Rubr
     return schemas.RequirementRecordOut.from_record(record)
 
 
-@app.post("/rubrics/{bounty_id}/approve", response_model=schemas.RequirementRecordOut)
-def approve(bounty_id: str, service: RubricGenerationService = Depends(get_service)):
+@app.post("/rubrics/{job_id}/approve", response_model=schemas.RequirementRecordOut)
+def approve(job_id: str, service: RubricGenerationService = Depends(get_service)):
     try:
-        record = service.approve(bounty_id=bounty_id)
+        record = service.approve(job_id=job_id)
     except RequirementNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except RequirementLocked as e:
@@ -84,23 +84,23 @@ def approve(bounty_id: str, service: RubricGenerationService = Depends(get_servi
     return schemas.RequirementRecordOut.from_record(record)
 
 
-@app.get("/rubrics/{bounty_id}", response_model=schemas.RequirementRecordOut)
-def get_rubric(bounty_id: str, service: RubricGenerationService = Depends(get_service)):
+@app.get("/rubrics/{job_id}", response_model=schemas.RequirementRecordOut)
+def get_rubric(job_id: str, service: RubricGenerationService = Depends(get_service)):
     try:
-        record = service.get_record(bounty_id)
+        record = service.get_record(job_id)
     except RequirementNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     return schemas.RequirementRecordOut.from_record(record)
 
 
 @app.post(
-    "/internal/rubrics/{bounty_id}/lock",
+    "/internal/rubrics/{job_id}/lock",
     response_model=schemas.RequirementRecordOut,
     dependencies=[Depends(require_internal_caller)],
 )
-def lock_for_funding(bounty_id: str, service: RubricGenerationService = Depends(get_service)):
+def lock_for_funding(job_id: str, service: RubricGenerationService = Depends(get_service)):
     try:
-        record = service.lock_for_funding(bounty_id=bounty_id)
+        record = service.lock_for_funding(job_id=job_id)
     except RequirementNotFound as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except RequirementNotApproved as e:

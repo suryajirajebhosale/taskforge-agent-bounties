@@ -7,25 +7,32 @@ import { Reveal, RevealGroup, revealItem } from "./Reveal";
 const STEPS = [
   {
     n: "01",
-    title: "Post a bounty",
-    body: "Describe the job in plain English. Merit drafts a machine-checkable rubric you approve before funding escrow.",
+    title: "Publish a contract",
+    body: "Ship the agent you already built with an I/O schema, price, and SLA. It stays in Sandbox until evals pass.",
   },
   {
     n: "02",
-    title: "Agents compete",
-    body: "Matched agents race the same bounty. Reputation ranks who gets first look — first verified pass wins.",
+    title: "Companies pick you",
+    body: "They run a batch or hire a retainer against that contract. No race. No first-pass lottery.",
   },
   {
     n: "03",
-    title: "Oracle verifies",
-    body: "Deterministic checks, sandboxed runs, and an LLM judge grade the work with a confidence score and rationale.",
+    title: "Merit verifies",
+    body: "Deterministic checks first, then an LLM judge with a confidence score. High-value jobs can get human review.",
   },
   {
     n: "04",
-    title: "Pay for proof",
-    body: "Pass releases escrow automatically. Fail returns your funds. Low-confidence or high-value jobs get human review.",
+    title: "You get paid",
+    body: "A pass pays the builder. A fail does not. The company still spends a run credit so grading is never free.",
   },
 ];
+
+const CHECKLIST = [
+  ["Contract listed", 0],
+  ["Certified", 1],
+  ["Job running", 2],
+  ["Payout", 3],
+] as const;
 
 export function HowItWorks() {
   const [active, setActive] = useState(0);
@@ -35,10 +42,10 @@ export function HowItWorks() {
       <Reveal className="mx-auto max-w-2xl text-center">
         <p className="text-xs font-semibold tracking-[0.28em] text-lavender uppercase">How it works</p>
         <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-          One loop from brief to <span className="text-gradient">paid result</span>
+          Store, meter, and <span className="text-gradient">referee</span>
         </h2>
         <p className="mt-4 text-muted">
-          Competition on the supply side. An automated verifier between your money and a payout.
+          One agent, many companies. The published contract is the product — not a Slack thread.
         </p>
       </Reveal>
 
@@ -85,26 +92,22 @@ export function HowItWorks() {
                 </p>
 
                 <div className="mt-8 space-y-3">
-                  {(
-                    [
-                      ["Rubric draft", active >= 0],
-                      ["Escrow funded", active >= 1],
-                      ["Agents racing", active >= 2],
-                      ["Payout ready", active >= 3],
-                    ] as const
-                  ).map(([label, on]) => (
-                    <div
-                      key={label}
-                      className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm ${
-                        on
-                          ? "border-lavender/30 bg-lavender/10 text-white"
-                          : "border-white/5 bg-white/[0.03] text-muted"
-                      }`}
-                    >
-                      <span>{label}</span>
-                      <span className={on ? "text-success" : "text-muted"}>{on ? "●" : "○"}</span>
-                    </div>
-                  ))}
+                  {CHECKLIST.map(([label, idx]) => {
+                    const on = active >= idx;
+                    return (
+                      <div
+                        key={label}
+                        className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm ${
+                          on
+                            ? "border-lavender/30 bg-lavender/10 text-white"
+                            : "border-white/5 bg-white/[0.03] text-muted"
+                        }`}
+                      >
+                        <span>{label}</span>
+                        <span className={on ? "text-success" : "text-muted"}>{on ? "●" : "○"}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </motion.div>
             </AnimatePresence>

@@ -50,7 +50,7 @@ def test_verify_endpoint_returns_a_pass_verdict_and_triggers_downstream(client):
         "/internal/verify",
         json={
             "submission_id": "s1",
-            "bounty_id": "b1",
+            "job_id": "b1",
             "agent_id": "agent1",
             "agent_developer_id": "dev1",
             "category": "sales_lead_generation",
@@ -59,7 +59,7 @@ def test_verify_endpoint_returns_a_pass_verdict_and_triggers_downstream(client):
                 "subjective_criteria": [],
             },
             "payload": {"lead_count": 150},
-            "bounty_amount_cents": 1000,
+            "job_amount_cents": 1000,
         },
         headers=INTERNAL_HEADERS,
     )
@@ -79,13 +79,13 @@ def test_verify_without_internal_key_is_rejected(client):
         "/internal/verify",
         json={
             "submission_id": "s1",
-            "bounty_id": "b1",
+            "job_id": "b1",
             "agent_id": "agent1",
             "agent_developer_id": "dev1",
             "category": "other",
             "requirement": {"objective_criteria": [{"field": "x", "comparator": ">=", "value": 1}], "subjective_criteria": []},
             "payload": {"x": 1},
-            "bounty_amount_cents": 100,
+            "job_amount_cents": 100,
         },
     )
 
@@ -98,13 +98,13 @@ def test_get_verdict_over_http(client):
         "/internal/verify",
         json={
             "submission_id": "s1",
-            "bounty_id": "b1",
+            "job_id": "b1",
             "agent_id": "agent1",
             "agent_developer_id": "dev1",
             "category": "other",
             "requirement": {"objective_criteria": [{"field": "x", "comparator": ">=", "value": 1}], "subjective_criteria": []},
             "payload": {"x": 1},
-            "bounty_amount_cents": 100,
+            "job_amount_cents": 100,
         },
         headers=INTERNAL_HEADERS,
     )
@@ -130,13 +130,13 @@ def test_human_review_flow_over_http(client):
         "/internal/verify",
         json={
             "submission_id": "s1",
-            "bounty_id": "b1",
+            "job_id": "b1",
             "agent_id": "agent1",
             "agent_developer_id": "dev1",
             "category": "content_media",
             "requirement": {"objective_criteria": [], "subjective_criteria": [{"description": "tone", "weight": 1.0}]},
             "payload": {},
-            "bounty_amount_cents": 100,
+            "job_amount_cents": 100,
         },
         headers=INTERNAL_HEADERS,
     )
@@ -166,13 +166,13 @@ def test_dispute_flow_over_http(client):
         "/internal/verify",
         json={
             "submission_id": "s1",
-            "bounty_id": "b1",
+            "job_id": "b1",
             "agent_id": "agent1",
             "agent_developer_id": "dev1",
             "category": "content_media",
             "requirement": requirement,
             "payload": {},
-            "bounty_amount_cents": 100,
+            "job_amount_cents": 100,
         },
         headers=INTERNAL_HEADERS,
     )

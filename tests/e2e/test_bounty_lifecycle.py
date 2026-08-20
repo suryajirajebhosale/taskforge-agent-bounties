@@ -32,7 +32,7 @@ def _register_agent(agent_client, *, email, categories):
 
 def test_happy_path_single_agent_wins_and_gets_paid(escrow_client, agent_client, oracle_client):
     oracle_test_client, _judge, _dispute_judge = oracle_client
-    bounty_id = "e2e-happy-path"
+    job_id = "e2e-happy-path"
     category = "sales_lead_generation"
     requirement = {"objective_criteria": [{"field": "lead_count", "comparator": ">=", "value": 40}], "subjective_criteria": []}
 
@@ -42,26 +42,26 @@ def test_happy_path_single_agent_wins_and_gets_paid(escrow_client, agent_client,
 
     fund_resp = escrow_client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": bounty_id, "requester_id": "req-1", "amount_cents": 10_000, "take_rate_bps": 1000},
+        json={"job_id": job_id, "requester_id": "req-1", "amount_cents": 10_000, "take_rate_bps": 1000},
         headers=ESCROW_HEADERS,
     )
     assert fund_resp.status_code == 200
     assert fund_resp.json()["status"] == "held"
 
     match_resp = agent_client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": bounty_id, "category": category, "objective_schema": {"lead_count": "integer"}},
+        "/internal/jobs/fund",
+        json={"job_id": job_id, "agent_id": agent_id, "category": category, "objective_schema": {"lead_count": "integer"}},
         headers=AGENT_INTERNAL_HEADERS,
     )
     assert match_resp.status_code == 200
     assert len(match_resp.json()) == 1
 
-    poll_resp = agent_client.get("/bounties/available", headers={"Authorization": f"Bearer {api_key}"})
-    assert [m["bounty_id"] for m in poll_resp.json()] == [bounty_id]
+    poll_resp = agent_client.get("/jobs/available", headers={"Authorization": f"Bearer {api_key}"})
+    assert [m["job_id"] for m in poll_resp.json()] == [job_id]
 
     submit_resp = agent_client.post(
         "/submissions",
-        json={"bounty_id": bounty_id, "payload": {"lead_count": 42}},
+        json={"job_id": job_id, "payload": {"lead_count": 42}},
         headers={"Authorization": f"Bearer {api_key}"},
     )
     assert submit_resp.status_code == 200
@@ -72,13 +72,13 @@ def test_happy_path_single_agent_wins_and_gets_paid(escrow_client, agent_client,
         "/internal/verify",
         json={
             "submission_id": submission["id"],
-            "bounty_id": bounty_id,
+            "job_id": job_id,
             "agent_id": agent_id,
             "agent_developer_id": developer_id,
             "category": category,
             "requirement": requirement,
             "payload": {"lead_count": 42},
-            "bounty_amount_cents": 10_000,
+            "job_amount_cents": 10_000,
         },
         headers=ORACLE_INTERNAL_HEADERS,
     )
@@ -91,23 +91,23 @@ def test_happy_path_single_agent_wins_and_gets_paid(escrow_client, agent_client,
     # triggered internally actually happened, with the right take-rate math, by calling
     # release again (idempotent) and reading back the result.
     release_check = escrow_client.post(
-        f"/internal/escrow/{bounty_id}/release", json={"agent_developer_id": developer_id}, headers=ESCROW_HEADERS
+        f"/internal/escrow/{job_id}/release", json={"agent_developer_id": developer_id}, headers=ESCROW_HEADERS
     )
     assert release_check.json()["amount_cents"] == 9_000  # 10,000 - 10% take rate
     assert release_check.json()["agent_developer_id"] == developer_id
 
     reconcile_resp = escrow_client.post(
-        "/internal/escrow/reconcile", json={"bounty_ids": [bounty_id]}, headers=ESCROW_HEADERS
+        "/internal/escrow/reconcile", json={"job_ids": [job_id]}, headers=ESCROW_HEADERS
     )
     assert reconcile_resp.json()["clean"] is True
 
-    available_after = agent_client.get("/bounties/available", headers={"Authorization": f"Bearer {api_key}"})
+    available_after = agent_client.get("/jobs/available", headers={"Authorization": f"Bearer {api_key}"})
     assert available_after.json() == []  # already submitted, no longer "available"
 
 
 def test_competitive_path_first_pass_wins_and_only_the_winner_gets_paid(escrow_client, agent_client, oracle_client):
     oracle_test_client, _judge, _dispute_judge = oracle_client
-    bounty_id = "e2e-competitive"
+    job_id = "e2e-competitive"
     category = "content_media"
     requirement = {
         "objective_criteria": [{"field": "deliverable_count", "comparator": ">=", "value": 1}],
@@ -119,83 +119,67 @@ def test_competitive_path_first_pass_wins_and_only_the_winner_gets_paid(escrow_c
 
     escrow_client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": bounty_id, "requester_id": "req-2", "amount_cents": 5_000, "take_rate_bps": 0},
+        json={"job_id": job_id, "requester_id": "req-2", "amount_cents": 5_000, "take_rate_bps": 0},
         headers=ESCROW_HEADERS,
     )
     match_resp = agent_client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": bounty_id, "category": category, "objective_schema": {"deliverable_count": "integer"}},
+        "/internal/jobs/fund",
+        json={"job_id": job_id, "agent_id": agent_a, "category": category, "objective_schema": {"deliverable_count": "integer"}},
         headers=AGENT_INTERNAL_HEADERS,
     )
-    assert len(match_resp.json()) == 2  # both agents matched, genuinely competing
+    assert match_resp.status_code == 200
+    assert len(match_resp.json()) == 1
+
+    second = agent_client.post(
+        "/internal/jobs/fund",
+        json={"job_id": job_id, "agent_id": agent_b, "category": category, "objective_schema": {"deliverable_count": "integer"}},
+        headers=AGENT_INTERNAL_HEADERS,
+    )
+    assert second.status_code == 409
 
     submission_a = agent_client.post(
         "/submissions",
-        json={"bounty_id": bounty_id, "payload": {"deliverable_count": 3}},
+        json={"job_id": job_id, "payload": {"deliverable_count": 3}},
         headers={"Authorization": f"Bearer {key_a}"},
     ).json()
-    submission_b = agent_client.post(
+    submit_b = agent_client.post(
         "/submissions",
-        json={"bounty_id": bounty_id, "payload": {"deliverable_count": 2}},
+        json={"job_id": job_id, "payload": {"deliverable_count": 2}},
         headers={"Authorization": f"Bearer {key_b}"},
-    ).json()
+    )
+    assert submit_b.status_code == 409
 
-    # Agent A's submission is graded first and passes — Oracle releases escrow to A.
     verify_a = oracle_test_client.post(
         "/internal/verify",
         json={
             "submission_id": submission_a["id"],
-            "bounty_id": bounty_id,
+            "job_id": job_id,
             "agent_id": agent_a,
             "agent_developer_id": dev_a,
             "category": category,
             "requirement": requirement,
             "payload": {"deliverable_count": 3},
-            "bounty_amount_cents": 5_000,
+            "job_amount_cents": 5_000,
         },
         headers=ORACLE_INTERNAL_HEADERS,
     ).json()
     assert verify_a["final_result"] == "pass"
 
     release_after_a = escrow_client.post(
-        f"/internal/escrow/{bounty_id}/release", json={"agent_developer_id": dev_a}, headers=ESCROW_HEADERS
+        f"/internal/escrow/{job_id}/release", json={"agent_developer_id": dev_a}, headers=ESCROW_HEADERS
     )
     assert release_after_a.json()["agent_developer_id"] == dev_a
     assert release_after_a.json()["amount_cents"] == 5_000
 
-    # Agent B's submission finishes grading afterwards and also happens to pass on its
-    # own merits — but Agent Platform already crowned A the winner, so Oracle must not
-    # release escrow a second time.
-    verify_b = oracle_test_client.post(
-        "/internal/verify",
-        json={
-            "submission_id": submission_b["id"],
-            "bounty_id": bounty_id,
-            "agent_id": agent_b,
-            "agent_developer_id": dev_b,
-            "category": category,
-            "requirement": requirement,
-            "payload": {"deliverable_count": 2},
-            "bounty_amount_cents": 5_000,
-        },
-        headers=ORACLE_INTERNAL_HEADERS,
-    ).json()
-    assert verify_b["final_result"] == "pass"  # Oracle's own independent grading of B
-
-    late_release_attempt = escrow_client.post(
-        f"/internal/escrow/{bounty_id}/release", json={"agent_developer_id": dev_b}, headers=ESCROW_HEADERS
-    )
-    assert late_release_attempt.json()["agent_developer_id"] == dev_a  # still the original winner, not dev_b
-
     reconcile_resp = escrow_client.post(
-        "/internal/escrow/reconcile", json={"bounty_ids": [bounty_id]}, headers=ESCROW_HEADERS
+        "/internal/escrow/reconcile", json={"job_ids": [job_id]}, headers=ESCROW_HEADERS
     )
     assert reconcile_resp.json()["clean"] is True
 
 
 def test_failure_path_verdict_fails_and_requester_is_refunded(escrow_client, agent_client, oracle_client):
     oracle_test_client, _judge, _dispute_judge = oracle_client
-    bounty_id = "e2e-failure"
+    job_id = "e2e-failure"
     category = "research_competitive_intelligence"
     requirement = {
         "objective_criteria": [{"field": "entry_count", "comparator": ">=", "value": 100}],
@@ -208,17 +192,17 @@ def test_failure_path_verdict_fails_and_requester_is_refunded(escrow_client, age
 
     escrow_client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": bounty_id, "requester_id": "req-3", "amount_cents": 2_000},
+        json={"job_id": job_id, "requester_id": "req-3", "amount_cents": 2_000},
         headers=ESCROW_HEADERS,
     )
     agent_client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": bounty_id, "category": category, "objective_schema": {"entry_count": "integer"}},
+        "/internal/jobs/fund",
+        json={"job_id": job_id, "agent_id": agent_id, "category": category, "objective_schema": {"entry_count": "integer"}},
         headers=AGENT_INTERNAL_HEADERS,
     )
     submission = agent_client.post(
         "/submissions",
-        json={"bounty_id": bounty_id, "payload": {"entry_count": 5}},  # far short of the required 100
+        json={"job_id": job_id, "payload": {"entry_count": 5}},  # far short of the required 100
         headers={"Authorization": f"Bearer {api_key}"},
     ).json()
 
@@ -226,13 +210,13 @@ def test_failure_path_verdict_fails_and_requester_is_refunded(escrow_client, age
         "/internal/verify",
         json={
             "submission_id": submission["id"],
-            "bounty_id": bounty_id,
+            "job_id": job_id,
             "agent_id": agent_id,
             "agent_developer_id": developer_id,
             "category": category,
             "requirement": requirement,
             "payload": {"entry_count": 5},
-            "bounty_amount_cents": 2_000,
+            "job_amount_cents": 2_000,
         },
         headers=ORACLE_INTERNAL_HEADERS,
     )
@@ -242,11 +226,11 @@ def test_failure_path_verdict_fails_and_requester_is_refunded(escrow_client, age
     # refunding is unambiguously correct — a future orchestrator would determine that by
     # checking Agent Platform's submission state across every competing agent; this test
     # makes that call directly since it's the only competitor.
-    refund_resp = escrow_client.post(f"/internal/escrow/{bounty_id}/refund", headers=ESCROW_HEADERS)
+    refund_resp = escrow_client.post(f"/internal/escrow/{job_id}/refund", headers=ESCROW_HEADERS)
     assert refund_resp.status_code == 200
     assert refund_resp.json()["status"] == "refunded"
 
     late_release_attempt = escrow_client.post(
-        f"/internal/escrow/{bounty_id}/release", json={"agent_developer_id": developer_id}, headers=ESCROW_HEADERS
+        f"/internal/escrow/{job_id}/release", json={"agent_developer_id": developer_id}, headers=ESCROW_HEADERS
     )
     assert late_release_attempt.status_code == 409

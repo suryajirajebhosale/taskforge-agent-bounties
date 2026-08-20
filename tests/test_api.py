@@ -39,7 +39,7 @@ HEADERS = {"X-Internal-Api-Key": "test-secret"}
 def test_fund_release_flow_over_http(client):
     fund_resp = client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": "b1", "requester_id": "req1", "amount_cents": 10_000, "take_rate_bps": 1000},
+        json={"job_id": "b1", "requester_id": "req1", "amount_cents": 10_000, "take_rate_bps": 1000},
         headers=HEADERS,
     )
     assert fund_resp.status_code == 200
@@ -55,7 +55,7 @@ def test_fund_release_flow_over_http(client):
 def test_requests_without_internal_key_are_rejected(client):
     resp = client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": "b1", "requester_id": "req1", "amount_cents": 10_000},
+        json={"job_id": "b1", "requester_id": "req1", "amount_cents": 10_000},
     )
     assert resp.status_code == 401
 
@@ -68,7 +68,7 @@ def test_release_on_unknown_bounty_returns_404(client):
 def test_release_twice_returns_409_on_wrong_state(client):
     client.post(
         "/internal/escrow/fund",
-        json={"bounty_id": "b1", "requester_id": "req1", "amount_cents": 5_000},
+        json={"job_id": "b1", "requester_id": "req1", "amount_cents": 5_000},
         headers=HEADERS,
     )
     client.post("/internal/escrow/b1/refund", headers=HEADERS)

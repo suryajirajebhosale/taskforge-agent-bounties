@@ -35,7 +35,7 @@ def client():
 def test_record_outcome_and_get_rating_over_http(client):
     resp = client.post(
         "/internal/outcomes",
-        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "bounty_amount_cents": 100},
+        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "job_amount_cents": 100},
         headers=INTERNAL_HEADERS,
     )
     assert resp.status_code == 200
@@ -49,7 +49,7 @@ def test_record_outcome_and_get_rating_over_http(client):
 def test_record_outcome_without_internal_key_is_rejected(client):
     resp = client.post(
         "/internal/outcomes",
-        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "bounty_amount_cents": 100},
+        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "job_amount_cents": 100},
     )
     assert resp.status_code == 401
 
@@ -57,13 +57,13 @@ def test_record_outcome_without_internal_key_is_rejected(client):
 def test_correct_outcome_over_http(client):
     client.post(
         "/internal/outcomes",
-        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "bounty_amount_cents": 100},
+        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "job_amount_cents": 100},
         headers=INTERNAL_HEADERS,
     )
 
     resp = client.post(
         "/internal/outcomes/v1/correct",
-        json={"agent_id": "a1", "agent_developer_id": "d1", "passed": False, "bounty_amount_cents": 100},
+        json={"agent_id": "a1", "agent_developer_id": "d1", "passed": False, "job_amount_cents": 100},
         headers=INTERNAL_HEADERS,
     )
     assert resp.status_code == 200
@@ -76,7 +76,7 @@ def test_correct_outcome_over_http(client):
 def test_leaderboard_endpoint(client):
     client.post(
         "/internal/outcomes",
-        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "bounty_amount_cents": 500},
+        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "job_amount_cents": 500},
         headers=INTERNAL_HEADERS,
     )
 
@@ -94,7 +94,7 @@ def test_leaderboard_rejects_bad_period(client):
 def test_finalize_and_pay_weekly_prize_over_http(client):
     client.post(
         "/internal/outcomes",
-        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "bounty_amount_cents": 500},
+        json={"verdict_id": "v1", "agent_id": "a1", "agent_developer_id": "d1", "passed": True, "job_amount_cents": 500},
         headers=INTERNAL_HEADERS,
     )
     period = week_key(datetime.now(timezone.utc), week_start_day=settings.week_start_day)

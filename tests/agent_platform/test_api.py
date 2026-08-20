@@ -45,13 +45,13 @@ def _register_agent(client, categories=("lead_generation",), integration_mode="p
 def test_register_and_authenticate_flow(client):
     agent_id, api_key = _register_agent(client)
 
-    resp = client.get("/bounties/available", headers={"Authorization": f"Bearer {api_key}"})
+    resp = client.get("/jobs/available", headers={"Authorization": f"Bearer {api_key}"})
     assert resp.status_code == 200
     assert resp.json() == []
 
 
 def test_missing_bearer_token_is_rejected(client):
-    resp = client.get("/bounties/available")
+    resp = client.get("/jobs/available")
     assert resp.status_code == 401
 
 
@@ -59,20 +59,20 @@ def test_fund_match_submit_flow_over_http(client):
     agent_id, api_key = _register_agent(client)
 
     fund_resp = client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": "b1", "category": "lead_generation", "objective_schema": {"lead_count": "integer"}},
+        "/internal/jobs/fund",
+        json={"job_id": "b1", "agent_id": agent_id, "category": "lead_generation", "objective_schema": {"lead_count": "integer"}},
         headers=INTERNAL_HEADERS,
     )
     assert fund_resp.status_code == 200
     assert len(fund_resp.json()) == 1
 
-    available_resp = client.get("/bounties/available", headers={"Authorization": f"Bearer {api_key}"})
+    available_resp = client.get("/jobs/available", headers={"Authorization": f"Bearer {api_key}"})
     assert len(available_resp.json()) == 1
-    assert available_resp.json()[0]["bounty_id"] == "b1"
+    assert available_resp.json()[0]["job_id"] == "b1"
 
     submit_resp = client.post(
         "/submissions",
-        json={"bounty_id": "b1", "payload": {"lead_count": 5}},
+        json={"job_id": "b1", "payload": {"lead_count": 5}},
         headers={"Authorization": f"Bearer {api_key}"},
     )
     assert submit_resp.status_code == 200
@@ -80,21 +80,21 @@ def test_fund_match_submit_flow_over_http(client):
 
 
 def test_internal_endpoints_reject_missing_key(client):
-    resp = client.post("/internal/bounties/fund", json={"bounty_id": "b1", "category": "lead_generation"})
+    resp = client.post("/internal/jobs/fund", json={"job_id": "b1", "category": "lead_generation"})
     assert resp.status_code == 401
 
 
 def test_submit_with_invalid_payload_returns_422(client):
     agent_id, api_key = _register_agent(client)
     client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": "b1", "category": "lead_generation", "objective_schema": {"lead_count": "integer"}},
+        "/internal/jobs/fund",
+        json={"job_id": "b1", "agent_id": agent_id, "category": "lead_generation", "objective_schema": {"lead_count": "integer"}},
         headers=INTERNAL_HEADERS,
     )
 
     resp = client.post(
         "/submissions",
-        json={"bounty_id": "b1", "payload": {}},
+        json={"job_id": "b1", "payload": {}},
         headers={"Authorization": f"Bearer {api_key}"},
     )
     assert resp.status_code == 422
@@ -103,17 +103,17 @@ def test_submit_with_invalid_payload_returns_422(client):
 def test_record_verdict_over_http(client):
     agent_id, api_key = _register_agent(client)
     client.post(
-        "/internal/bounties/fund",
-        json={"bounty_id": "b1", "category": "lead_generation", "objective_schema": {}},
+        "/internal/jobs/fund",
+        json={"job_id": "b1", "agent_id": agent_id, "category": "lead_generation", "objective_schema": {}},
         headers=INTERNAL_HEADERS,
     )
     submit_resp = client.post(
-        "/submissions", json={"bounty_id": "b1", "payload": {}}, headers={"Authorization": f"Bearer {api_key}"}
+        "/submissions", json={"job_id": "b1", "payload": {}}, headers={"Authorization": f"Bearer {api_key}"}
     )
     submission_id = submit_resp.json()["id"]
 
     verdict_resp = client.post(
-        "/internal/bounties/b1/verdict",
+        "/internal/jobs/b1/verdict",
         json={"submission_id": submission_id, "passed": True},
         headers=INTERNAL_HEADERS,
     )
