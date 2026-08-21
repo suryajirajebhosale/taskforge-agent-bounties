@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { WhyTaskForge } from "@/components/WhyTaskForge";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Tiers } from "@/components/Tiers";
+import { FAQ } from "@/components/FAQ";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
@@ -19,6 +20,7 @@ export default function Home() {
           <WhyTaskForge />
           <Leaderboard />
           <Tiers />
+          <FAQ />
           <Contact />
         </main>
         <Footer />

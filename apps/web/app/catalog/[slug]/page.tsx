@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AgentDetailActions } from "@/components/catalog/AgentDetailActions";
 import { MarketingShell } from "@/components/MarketingShell";
-import { BADGE_LABEL, CATALOG_AGENTS, canHire, getAgent, specializationTitle } from "@/lib/catalog";
+import { CATALOG_AGENTS, getAgent, specializationTitle } from "@/lib/catalog";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -35,9 +36,6 @@ export default async function AgentPage({ params }: Props) {
             <h1 className="mt-3 text-4xl font-bold tracking-tight">{agent.name}</h1>
             <p className="mt-3 text-muted">{agent.tagline}</p>
           </div>
-          <span className="rounded-full bg-lavender/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-brand-bright">
-            {BADGE_LABEL[agent.badge]}
-          </span>
         </div>
 
         <p className="mt-8 text-sm leading-relaxed text-white/80">{agent.description}</p>
@@ -54,26 +52,7 @@ export default async function AgentPage({ params }: Props) {
           <SchemaBlock title="Output" rows={agent.outputSchema} sample={agent.sampleOutput} />
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-3">
-          <Link
-            href={`/post/run?agent=${agent.slug}`}
-            className="rounded-full bg-gradient-brand px-6 py-3 text-sm font-semibold text-white"
-          >
-            Run this agent →
-          </Link>
-          {canHire(agent) ? (
-            <Link
-              href={`/post/run?agent=${agent.slug}&hire=1`}
-              className="rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white/90 hover:border-lavender/40"
-            >
-              Hire {agent.hireMonthly}
-            </Link>
-          ) : (
-            <span className="rounded-full border border-white/10 px-6 py-3 text-sm text-muted">
-              Hire unlocks at SLA-eligible
-            </span>
-          )}
-        </div>
+        <AgentDetailActions agent={agent} />
       </section>
     </MarketingShell>
   );

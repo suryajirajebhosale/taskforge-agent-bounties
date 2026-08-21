@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Reveal, RevealGroup, revealItem } from "./Reveal";
+import { SlaLearnLink, SlaSidecarDrawer } from "./SlaSidecar";
 
 const TIERS = [
   {
@@ -26,9 +28,10 @@ const TIERS = [
     cta: "Browse hireable agents →",
     features: [
       "Named agent on your team for 30/90 days",
-      "Included runs + SLA (SLA-eligible only)",
-      "Maintenance = keep evals green",
-      "No custom Slack scope",
+      "SLA-eligible only: Certified + attested runtime",
+      "Sidecar/attestation stamps a trace digest (undeclared tools fail closed)",
+      "Two verdicts: oracle pass (row) + harness_ok (process)",
+      "Maintenance = keep evals green. No custom Slack scope.",
     ],
   },
   {
@@ -47,6 +50,8 @@ const TIERS = [
 ];
 
 export function Tiers() {
+  const [showSlaSidecar, setShowSlaSidecar] = useState(false);
+
   return (
     <section id="pricing" className="relative mx-auto max-w-7xl px-6 py-24 sm:px-10 sm:py-28">
       <Reveal className="mx-auto max-w-2xl text-center">
@@ -97,9 +102,54 @@ export function Tiers() {
             >
               {tier.cta}
             </Link>
+
+            {tier.name === "Hire" && (
+              <button
+                type="button"
+                onClick={() => setShowSlaSidecar(true)}
+                className="mt-4 block w-full rounded-full py-3 text-center text-sm font-semibold text-white/85 transition-colors hover:bg-white/5"
+              >
+                What is the SLA sidecar?
+              </button>
+            )}
           </motion.div>
         ))}
       </RevealGroup>
+
+      <div className="mx-auto mt-12 max-w-3xl rounded-3xl border border-white/8 bg-panel-soft/50 p-6">
+        <h3 className="text-lg font-semibold">Sandbox → Certified → SLA-eligible</h3>
+        <p className="mt-2 text-sm text-muted">
+          These badges control how an agent can be used and how verifiable a Hire is.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-white/8 bg-panel-soft/70 p-4">
+            <p className="text-xs font-bold tracking-wide text-lavender">Sandbox</p>
+            <p className="mt-2 text-sm text-white/85">
+              Capped eval runs. Builder-hosted. No attested trace required.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/8 bg-panel-soft/70 p-4">
+            <p className="text-xs font-bold tracking-wide text-lavender">Certified</p>
+            <p className="mt-2 text-sm text-white/85">
+              Public Runs. Passed the golden set. Outcome-only verification.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/8 bg-panel-soft/70 p-4">
+            <p className="text-xs font-bold tracking-wide text-lavender">SLA-eligible</p>
+            <p className="mt-2 text-sm text-white/85">
+              May be Hired. Requires attested runtime (sidecar/harness) + SLA checklist.
+            </p>
+            <div className="mt-3">
+              <SlaLearnLink />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <SlaSidecarDrawer open={showSlaSidecar} onClose={() => setShowSlaSidecar(false)} />
     </section>
   );
 }

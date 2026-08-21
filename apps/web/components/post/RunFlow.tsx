@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CATALOG_AGENTS, SPECIALIZATIONS, canHire, getAgent, type CatalogAgent } from "@/lib/catalog";
 import { getSession, saveSession, type MeritSession } from "@/lib/session";
+import { SlaLearnLink } from "@/components/SlaSidecar";
 import {
   Eyebrow,
   FlowHeader,
@@ -22,26 +23,16 @@ export function RunFlow() {
   const presetSlug = search.get("agent");
   const wantHire = search.get("hire") === "1";
 
-  const [session, setSession] = useState<MeritSession | null>(null);
-  const [step, setStep] = useState<Step>("signup");
+  const initialSession = getSession();
+  const presetAgent = presetSlug ? getAgent(presetSlug) : null;
+
+  const [session, setSession] = useState<MeritSession | null>(initialSession);
+  const [step, setStep] = useState<Step>(initialSession ? "job" : "signup");
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState("");
-  const [agent, setAgent] = useState<CatalogAgent | null>(null);
+  const [agent, setAgent] = useState<CatalogAgent | null>(presetAgent);
   const [mode, setMode] = useState<"run" | "hire">(wantHire ? "hire" : "run");
-  const [specId, setSpecId] = useState<string>(SPECIALIZATIONS[0].id);
-
-  useEffect(() => {
-    const existing = getSession();
-    if (existing) {
-      setSession(existing);
-      setStep("job");
-    }
-    const preset = presetSlug ? getAgent(presetSlug) : undefined;
-    if (preset) {
-      setAgent(preset);
-      setSpecId(preset.templateId);
-    }
-  }, [presetSlug]);
+  const [specId, setSpecId] = useState<string>(presetAgent?.templateId ?? SPECIALIZATIONS[0].id);
 
   const spec = useMemo(
     () => SPECIALIZATIONS.find((s) => s.id === specId) ?? SPECIALIZATIONS[0],
@@ -140,7 +131,10 @@ export function RunFlow() {
             <h1 className="mt-3 text-3xl font-bold tracking-tight">
               {rowCount} rows · {spec.title}
             </h1>
-            <p className="mt-3 text-sm text-muted">Pick a listed agent. Hire is SLA-eligible only.</p>
+            <p className="mt-3 text-sm text-muted">
+              Pick a listed agent. Hire is SLA-eligible only.{" "}
+              <SlaLearnLink label="Why SLA is verified →" />
+            </p>
             <div className="mt-6 space-y-3">
               {listed.map((a) => (
                 <button
@@ -168,13 +162,21 @@ export function RunFlow() {
               )}
             </div>
             {agent && canHire(agent) && (
-              <div className="mt-5 flex gap-2">
-                <ModeChip active={mode === "run"} onClick={() => setMode("run")}>
-                  Run (credits)
-                </ModeChip>
-                <ModeChip active={mode === "hire"} onClick={() => setMode("hire")}>
-                  Hire {agent.hireMonthly}
-                </ModeChip>
+              <div className="mt-5 space-y-3">
+                <div className="flex gap-2">
+                  <ModeChip active={mode === "run"} onClick={() => setMode("run")}>
+                    Run (credits)
+                  </ModeChip>
+                  <ModeChip active={mode === "hire"} onClick={() => setMode("hire")}>
+                    Hire {agent.hireMonthly}
+                  </ModeChip>
+                </div>
+                {mode === "hire" && (
+                  <p className="text-xs text-muted">
+                    Hire uses an attested sidecar (tools/models fail closed).{" "}
+                    <SlaLearnLink />
+                  </p>
+                )}
               </div>
             )}
             <div className="mt-6">
@@ -211,9 +213,15 @@ export function RunFlow() {
                   <li>Retainer: {agent.hireMonthly}</li>
                   <li>Included runs: {agent.includedRuns?.toLocaleString()}</li>
                   <li>Maintenance = keep this contract green. No custom scope.</li>
+                  <li>Two verdicts: oracle pass + harness_ok (sidecar).</li>
                 </>
               )}
             </ul>
+            {mode === "hire" && (
+              <p className="mt-4 text-xs text-muted">
+                <SlaLearnLink label="How sidecar verification works →" />
+              </p>
+            )}
             <div className="mt-8">
               <Primary type="button" onClick={() => setStep("done")}>
                 {mode === "hire" ? "Confirm hire →" : "Confirm run →"}

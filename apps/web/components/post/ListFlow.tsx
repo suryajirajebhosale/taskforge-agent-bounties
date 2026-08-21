@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { SPECIALIZATIONS } from "@/lib/catalog";
@@ -10,8 +10,9 @@ import { Eyebrow, Field, FlowHeader, Panel, Primary, SignupForm, handleSignup } 
 type Step = "signup" | "form" | "done";
 
 export function ListFlow() {
-  const [session, setSession] = useState<MeritSession | null>(null);
-  const [step, setStep] = useState<Step>("signup");
+  const initialSession = getSession();
+  const [session, setSession] = useState<MeritSession | null>(initialSession);
+  const [step, setStep] = useState<Step>(initialSession ? "form" : "signup");
   const [error, setError] = useState<string | null>(null);
   const [agentName, setAgentName] = useState("");
   const [specId, setSpecId] = useState<string>(SPECIALIZATIONS[0].id);
@@ -19,14 +20,6 @@ export function ListFlow() {
     () => SPECIALIZATIONS.find((s) => s.id === specId) ?? SPECIALIZATIONS[0],
     [specId],
   );
-
-  useEffect(() => {
-    const existing = getSession();
-    if (existing) {
-      setSession(existing);
-      setStep("form");
-    }
-  }, []);
 
   function onSignup(e: FormEvent<HTMLFormElement>) {
     const err = handleSignup(e, (next) => {

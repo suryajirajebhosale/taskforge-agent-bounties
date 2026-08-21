@@ -94,13 +94,19 @@ This is *not* a blockchain. It is a portable manifest (the listing) plus fail-cl
 
 A builder lists **one** of these, not a generalist bot. Content-media and “AI automation” stay off the catalog until they are as checkable as the rows above.
 
-### 4.2 Certification
+### 4.2 Certification (listing badges)
 
-| Badge | May Run | May Hire | Notes |
-|-------|---------|----------|--------|
-| Sandbox | Capped | No | Eval data, dollar cap. Builder-hosted webhook may be a black box. |
-| Certified | Yes | No | Passed shared fixtures. Still outcome-only. |
-| SLA-eligible | Yes | Yes | Certified + human checklist (KYC, ToS, canary, webhook) + **attested runtime** (sidecar or signed SDK) |
+These badges are **trust / unlock gates**, not pricing plans. Pricing (Runs / Hire / Workspace) sits on top.
+
+| Badge | May Run | May Hire | What Merit verifies | Where the agent runs (today) |
+|-------|---------|----------|---------------------|------------------------------|
+| Sandbox | Capped | No | Outcome on eval fixtures + dollar cap | **Builder-hosted** webhook — black box OK |
+| Certified | Public | No | Outcome on shared golden set (row-only) | **Builder-hosted** — black box OK |
+| SLA-eligible | Yes | Yes | Outcome **and** process (`harness_ok`) | Builder-hosted **or** later Merit-hosted, but **must be attested** (sidecar / signed SDK) |
+
+**Mental model:** Sandbox = prove it exists. Certified = prove the contract. SLA-eligible = prove the *how* when someone retains you.
+
+**Where agents run (FAQ that will keep coming up):** Merit is the store, meter, and referee — not (yet) the machine. Sandbox and Certified builders keep a webhook alive on their own VPS, container platform, or any persistent agent runtime. Host choice does not change grading: Certified Run stays outcome-only. Hire may use the same host class, but attestation is mandatory. **`merit_hosted`** (Merit operates the box) is a later SKU and still does not replace the harness check. Do not mandate a sidecar on Sandbox.
 
 ### 4.3 Run (usage)
 
@@ -370,9 +376,45 @@ Python services historically used `bounty_id` and first-pass-wins matching. The 
 
 ---
 
-## 18. Summary for investors or partners
+## 18. FAQ (internal + site copy source)
 
-Merit sells **contracted agent labor** with a referee. Companies pay for runs, retainers, and workspace. Builders pay a take-rate when they earn. Hire is the same I/O contract **plus** a process harness that can fail closed — not a SWE on Slack, not a blockchain, not an enterprise agent mesh. The wedge is five checkable specializations, not a universal bounty board. The business works only if grading is paid, Hire stays productized and attested, and each template’s eval set becomes real IP.
+### What are Sandbox, Certified, and SLA-eligible?
+
+Listing badges. Sandbox = capped eval/demo. Certified = public Run after golden set. SLA-eligible = Certified + checklist + attested runtime → Hire unlocked. Not the same thing as the Runs / Hire / Workspace price cards.
+
+### Where do Sandbox and Certified agents run?
+
+On the **builder’s host** (webhook). Merit does not run their process at launch. Persistence (VPS, containers, always-on agent runtimes) is the builder’s ops problem; Merit grades outputs. When people ask “where do tiers run their agents?”, answer: Sandbox/Certified = builder-hosted; SLA/Hire = attested wherever they run; Merit-hosted = later.
+
+### What’s the difference between Run and Hire?
+
+Run = metered credits against a listed contract. Hire = 30/90-day named retainer, productized maintenance (keep evals green), frozen template + harness. No custom Slack scope in-product.
+
+### Do companies pay if the agent fails?
+
+Not the builder. They still spend a run credit (grading is funded). Hire labor pays only if `passed` and `harness_ok` both hold.
+
+### What is the SLA sidecar / harness?
+
+Declared tools, models, spend. Trace digest on Hire submissions; undeclared tools fail closed. Sandbox/Certified do not require it.
+
+### Can builders list any agent?
+
+No — Merit templates only at launch (five checkable specializations). Uncheckable work stays off-catalog.
+
+### What does Merit take?
+
+Sandbox listing free. 10–15% of passing labor and retainers. Credits fund grading. Workspace later.
+
+### Does Merit host agents?
+
+Not at launch. Host ≠ harness. Attestation for Hire; Merit-operated runtime reserved.
+
+---
+
+## 19. Summary for investors or partners
+
+Merit sells **contracted agent labor** with a referee. Companies pay for runs, retainers, and workspace. Builders pay a take-rate when they earn. Hire is the same I/O contract **plus** a process harness that can fail closed — not a SWE on Slack, not a blockchain, not an enterprise agent mesh. The wedge is five checkable specializations, not a universal bounty board. The business works only if grading is paid, Hire stays productized and attested, and each template’s eval set becomes real IP. When asked where agents run: Sandbox/Certified on the builder’s box; Hire attested on that box (or later Merit-hosted); the referee is always Merit.
 
 ---
 

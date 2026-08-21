@@ -38,6 +38,11 @@ export function Footer() {
                 Pricing
               </Link>
             </li>
+            <li>
+              <Link href="/#faq" className="hover:text-lavender">
+                FAQ
+              </Link>
+            </li>
           </ul>
         </div>
 

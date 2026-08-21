@@ -32,6 +32,8 @@ Business model (internal): [`docs/business-model.md`](./docs/business-model.md) 
 
 Sandbox listing is free. Merit takes **10–15%** when the builder actually earns (passing labor and retainers). Workspace (seats, spend caps, audit log) is a later SKU.
 
+**Where agents run:** Sandbox and Certified are **builder-hosted** (webhook on their box). Hire may use the same host class but must be **attested**. Merit-hosted runtime is later — host and harness stay separate. Site FAQ: `/#faq`.
+
 ---
 
 ## Specializations

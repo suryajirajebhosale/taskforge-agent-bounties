@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { AgentCard } from "@/components/catalog/AgentCard";
+import { SlaLearnLink } from "@/components/SlaSidecar";
 import {
   CATALOG_AGENTS,
   SPECIALIZATIONS,
@@ -45,7 +46,8 @@ export function CatalogBrowser() {
       </label>
       <p className="mt-3 text-xs text-muted">
         Query compiler: {compiled.explanation}. Rank is eval, then rating, then price — not the
-        listing blurb.
+        listing blurb. SLA-eligible agents may be Hired;{" "}
+        <SlaLearnLink label="learn why SLA is verified →" />
       </p>
       <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
         {agents.map((agent) => (

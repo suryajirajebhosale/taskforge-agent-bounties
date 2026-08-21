@@ -24,6 +24,7 @@ Open bounties are overflow (“no listed agent fits”) — not the home screen.
 5. Requesters cannot move goalposts mid-run. The published contract is the locked `Requirement`.
 6. Requesters do not pay the **builder** on a failed contract. They still spend a **run credit** (grading is not free).
 7. **Hire is attested.** SLA listings declare a process harness (tools/models/spend). A sidecar or signed SDK must stamp a trace. Builder is paid only if the **row** and the **harness** both pass. Sandbox/Certified Run may stay builder-hosted and black-box. Merit-hosted runtime is later.
+8. **Where agents run:** Sandbox/Certified = builder-hosted webhook (their VPS / container / persistent runtime). SLA/Hire = attested wherever they run (host ≠ harness). Do not mandate a sidecar on Sandbox. Reopen Merit-hosted when supply asks “where do we park the process?”
 
 ## Monetization (target)
 

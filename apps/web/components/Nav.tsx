@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/catalog", label: "Catalog" },
   { href: "/builders", label: "For builders" },
   { href: "/#pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
   { href: "/#contact", label: "Contact" },
 ];
 
